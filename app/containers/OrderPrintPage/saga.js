@@ -18,6 +18,9 @@ function* orderPrintCall(action){
 
 
     try{
+
+
+        //Sends post request to my back-end server.
         const response = yield call(request, fbAdminAPI + "/order_print", {
 
             method:"POST",
