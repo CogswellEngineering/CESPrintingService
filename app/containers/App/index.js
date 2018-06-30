@@ -13,15 +13,18 @@
 
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import HomePage from 'containers/HomePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
+import OrderPrintPage from 'containers/OrderPrintPage';
 
 export default function App() {
   return (
     <div>
       <Switch>
         <Route exact path="/" component={HomePage} />
+        <Route path = "/order-print" component= {OrderPrintPage}/>
         <Route component={NotFoundPage} />
       </Switch>
     </div>
