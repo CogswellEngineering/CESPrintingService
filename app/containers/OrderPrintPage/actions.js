@@ -8,8 +8,19 @@ import {
     PAGE_TURNED,
     FIELD_CHANGED,
     MODEL_UPLOADED,
+    PRINTER_INFO_UPDATED,
 } from './constants';
 
+
+function updatedPrinterInfo(printerInfo){
+
+    return {
+
+        type: PRINTER_INFO_UPDATED,
+        printerInfo,
+    }
+
+}
 
 function pageTurned(page){
 
@@ -88,4 +99,5 @@ export {
     pageTurned,
     fieldChanged,
     modelUploaded,
+    updatedPrinterInfo,
 };

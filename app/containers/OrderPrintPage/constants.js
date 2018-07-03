@@ -12,6 +12,7 @@ const PRINT_ORDER_SUCCESS = PREFIX + "/PRINT_ORDER_SUCCESS";
 const PRINT_CANCELLED = PREFIX + "/PRINCE_CANCELLED";
 //Will decide if site constant or just on this page later for queue, regardless will just port the stuff needed to siteconstant instead.
 
+const PRINTER_INFO_UPDATED = PREFIX + "PRINTER_INFO_UPDATED";
 
 
 const MODEL_UPLOADED = PREFIX + "/MODEL_UPLOADED";
@@ -31,4 +32,5 @@ export{
     FIELD_CHANGED,
     MODEL_UPLOADED,
     PAGE_TURNED,
+    PRINTER_INFO_UPDATED,
 };

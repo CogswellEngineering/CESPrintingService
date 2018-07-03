@@ -3,6 +3,23 @@ import { ORDER_PRINT_PATH} from 'components/Header/pages';
 
 const orderPrintPageState = (state) => state.get(ORDER_PRINT_PATH);
 
+//Just remember prefix is make, not create woops.
+const createSelectPrinterInfo = () => createSelector(
+
+
+    orderPrintPageState,
+    (orderPrintPageState) => {
+
+        if (orderPrintPageState == null) return {
+            colors:[],
+        }
+
+        return orderPrintPageState.get("printerState");
+
+    }
+
+)
+
 const createSelectShownPerPage = () => createSelector(
 
     orderPrintPageState,
@@ -84,5 +101,6 @@ export {
     createSelectCurrentPage,
     createSelectField,
     createSelectBool,
+    createSelectPrinterInfo,
     createUploadedModelSelector,
 }

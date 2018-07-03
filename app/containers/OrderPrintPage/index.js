@@ -11,7 +11,8 @@ import { compose } from 'redux';
 
 //Will port code over later, I don't want to duplicate that code.
 import { createStructuredSelector } from 'reselect';
-import { Form, Label, Input} from 'reactstrap';
+import { Form, Label, Input, 
+    Dropdown, DropdownToggle, DropdownMenu, DropdownItem,} from 'reactstrap';
 import reducer from './reducer';
 //Pagination imports
 import Pagination from 'rc-pagination';
@@ -31,6 +32,7 @@ import {
     createSelectBool,
     createSelectField,
     createUploadedModelSelector,
+    createSelectPrinterInfo,
 
 } from './selectors';
 
@@ -44,6 +46,7 @@ import {
     fieldChanged,
     modelUploaded,
     pageTurned,
+    updatedPrinterInfo,
 } from './actions';
 
 
@@ -83,8 +86,17 @@ class OrderPrintPage extends Component{
 
         super(props);
 
-        this.unsubscribe = null;
+        console.log(props);
+
+        this.unsubscribeCalls = [];
         console.log("hello");
+
+        //Does this really have to be that?
+        this.state = {
+            colorDdOpen:false,
+        }
+
+        this.toggleDd = this.toggleDd.bind(this);
 
     }
     
@@ -94,18 +106,22 @@ class OrderPrintPage extends Component{
         //Creates firestore ref for
         console.log(this.props);
         console.log("firebase ref",this.props.firebase);
-        const queueRef = this.props.firebase.firestore().collection("PrinterServiceInfo").doc("Orders").collection("Queue");
+
+        const printerServiceInfoRef = this.props.firebase.firestore().collection("PrinterServiceInfo");
+        const queueRef = printerServiceInfoRef.doc("Orders").collection("Queue");
+        const printerStateRef = printerServiceInfoRef.doc("PrinterState");
 
         const options = {
             //For changes to alrady added posts.
             includeMetadataChanges: true,
         };
 
-        this.unsubscribe = queueRef.onSnapshot(options,(docSnapshot) => {
+        //Subscription for queue.
+        this.unsubscribeCalls.push(queueRef.onSnapshot(options,(docSnapshot) => {
 
                     var newQueue = [];
                     const docs = docSnapshot.docs;
-                    console.log("docs",docs);
+                   
                     for ( const index in docSnapshot.docs){
 
                         const doc = docs[index];
@@ -118,22 +134,53 @@ class OrderPrintPage extends Component{
 
                     this.props.onQueueUpdated(newQueue);                
             }
-        );
+        ));
+
+
+        //Subscription for colors available.
+        this.unsubscribeCalls.push(printerStateRef.onSnapshot(doc => {
+
+            console.log("doc data",doc.data());
+            this.props.onUpdatePrinterInfo(doc.data());
+        }))
     }
 
     componentWillUnmount(){
 
-        //Stops the event listener for updating queue
-        this.unsubscribe();
+        //Stops the event listener for
+        for (const unsubscribe in this.unsubscribeCalls){
+
+            unsubscribe();
+        }
+    }
+
+
+    toggleDd(event){
+
+        const target = event.target;
+
+        console.log("target",target);
+        this.setState({
+
+            colorDdOpen : !this.state.colorDdOpen,
+
+        });
+
+
     }
 
     render(){
 
 
         const {queue, queueShown, ordering, color, height, width, printReady, model, firebase,
+            printerState,
             shownPerPage, currentPage, 
             onFieldChanged, onModelUploaded, onOrderPrint} = this.props;
 
+
+        if (printerState == null){
+            return null;
+        }
         return (<OrderPrintPageWrapper>
 
                 {/*Need to install this and look at documentation for it*/}
@@ -160,11 +207,9 @@ class OrderPrintPage extends Component{
                         var formData = new FormData();
 
                         formData.append("model",model);
-                        formData.append("color","red");
+                        formData.append("color",color);
                         formData.append("dimensions", {width,height});
-                        formData.append("orderer", uid);
-
-                      
+                        formData.append("orderer", uid);                      
 
                         onOrderPrint( formData);
                         
@@ -177,6 +222,26 @@ class OrderPrintPage extends Component{
 
                     <Label for = "height"> Choose height </Label>
                     <Input name = "height" id = "height" onChange = { (evt) => {onFieldChanged(evt);}} value = {height}/>
+
+                    {/*Do these REALLY have to be in redux state too? I mean i know one source of truth but shit*/}
+                    <Dropdown  name = "colorDd" isOpen = {this.state.colorDdOpen} toggle={this.toggleDd}>
+
+                        <DropdownToggle caret>
+                            
+                            {color}
+
+                        </DropdownToggle>
+
+                        <DropdownMenu >
+
+                            {printerState.colors.map( color => {
+                                return <DropdownItem key = {color} name="color" onClick = {(evt) => {onFieldChanged(evt);}}> {color} </DropdownItem>
+                            })}
+
+                        </DropdownMenu>
+
+
+                    </Dropdown>
 
                     <DropZone onDrop = { (fileDropped) => {
                         
@@ -205,6 +270,7 @@ class OrderPrintPage extends Component{
 
 const  mapStateToProps = createStructuredSelector({
 
+    printerState : createSelectPrinterInfo(),
     queue : createQueueSelector(""),
     queueShown : createQueueSelector("Shown"),
     currentPage : createSelectCurrentPage(),
@@ -243,6 +309,12 @@ function mapDispatchToProps(dispatch){
         onOrderPrint : (orderInfo) => {
 
             return dispatch(orderedPrint(orderInfo));
+        },
+
+        onUpdatePrinterInfo : (update) => {
+
+            return dispatch(updatedPrinterInfo(update));
+
         },
          
         onFieldChanged : (evt) => {

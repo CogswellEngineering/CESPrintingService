@@ -8,6 +8,7 @@ import {
     QUEUE_UPDATED,
     PAGE_TURNED,
     MODEL_UPLOADED,
+    PRINTER_INFO_UPDATED,
 } from './constants';
 
 
@@ -15,7 +16,11 @@ const initialState = fromJS({
 
     /*State fields related to the model queue*/
     //I could separate the shown queue part, or keep together like did BlogPage
-    queue:[],
+    queue:[], 
+    printerState : {
+        colors : []
+
+    },
     //What's currently shown based on page.
     queueShown:[],
     currentPage:1,
@@ -28,6 +33,7 @@ const initialState = fromJS({
     width:"",
     unit:"",
     color:"",
+
     //Will add option to upload xk3g file or just make it so these go away if modelFile is of type xk3g, prob better like that
     //but there are other types that are print ready, okay will give button for this options.
     isPrintReadyModel:false,
@@ -71,6 +77,7 @@ export default function orderPrintReducer(state = initialState, action){
         /*Shown Queue Related actions*/
 
 
+
         case QUEUE_UPDATED:
 
             const updatedShownQueue = getShownQueue(state.get("currentPage"), action.queue, state.get("shownPerPage"));
@@ -89,6 +96,13 @@ export default function orderPrintReducer(state = initialState, action){
                 .set("queueShown", shownQueue);
 
         //Literally exact same stuff like blog.
+
+        case PRINTER_INFO_UPDATED:
+
+
+            return state
+                .set("printerState", action.printerInfo)
+                .set("color", action.printerInfo.colors[0]);
 
         case MODEL_UPLOADED:
 
