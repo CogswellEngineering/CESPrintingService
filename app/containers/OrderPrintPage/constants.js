@@ -30,4 +30,5 @@ export{
     QUEUE_UPDATED,
     FIELD_CHANGED,
     MODEL_UPLOADED,
+    PAGE_TURNED,
 };

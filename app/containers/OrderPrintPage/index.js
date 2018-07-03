@@ -6,7 +6,6 @@ import { ORDER_PRINT_PATH} from 'components/Header/pages';
 
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
-import { withFirebase } from 'react-redux-firebase';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 
@@ -20,6 +19,12 @@ import 'rc-pagination/assets/index.css';
 import DropZone from 'react-dropzone';
 
 import {
+    makeSelectFirebase,
+    makeSelectLoggedIn,
+}
+from 'containers/App/selectors';
+
+import {
     createQueueSelector,
     createSelectShownPerPage,
     createSelectCurrentPage,
@@ -31,6 +36,8 @@ import {
 
 import saga from './saga';
 
+var fileDownload = require('js-file-download');
+
 import {
     orderedPrint,
     queueUpdated,
@@ -38,6 +45,7 @@ import {
     modelUploaded,
     pageTurned,
 } from './actions';
+
 
 
 
@@ -50,8 +58,16 @@ const OrderPrintPageWrapper = styled.div`
 
 `
 
+const OrderInfo = styled.span`
+
+    width:10%;
+    margin-left:1%;
+
+`
+
 const PrintQueue = styled.div`
 
+    margin-top :10%;
     
 
 `
@@ -68,30 +84,41 @@ class OrderPrintPage extends Component{
         super(props);
 
         this.unsubscribe = null;
+        console.log("hello");
+
     }
     
     componentDidMount(){
 
+
         //Creates firestore ref for
         console.log(this.props);
         console.log("firebase ref",this.props.firebase);
-        const queueRef = this.props.firebase.firestore().ref().collection("PrinterServiceInfo");
+        const queueRef = this.props.firebase.firestore().collection("PrinterServiceInfo").doc("Orders").collection("Queue");
 
-        this.unsubscribe = queueRef.doc("OrderedPrints").onSnapshot(snapshot => {
+        const options = {
+            //For changes to alrady added posts.
+            includeMetadataChanges: true,
+        };
 
+        this.unsubscribe = queueRef.onSnapshot(options,(docSnapshot) => {
 
-            if (snapshot.exists){
-                //It should be looking at all fields
-                //Hopefully data just gets everything as single object
-                //Will need tab and window thing.
-                const queue = snapshot.get("queue");
-                console.log(snapshot.get("queue"));
+                    var newQueue = [];
+                    const docs = docSnapshot.docs;
+                    console.log("docs",docs);
+                    for ( const index in docSnapshot.docs){
 
-                //Dispatches updated queue action.
-                this.props.onQueueUpdated(queue);
+                        const doc = docs[index];
 
+                        if (doc.exists){
+                            newQueue.push(doc.data());
+                        }
+                    }
+                    console.log("new queue",newQueue);
+
+                    this.props.onQueueUpdated(newQueue);                
             }
-        })
+        );
     }
 
     componentWillUnmount(){
@@ -100,17 +127,12 @@ class OrderPrintPage extends Component{
         this.unsubscribe();
     }
 
-    componentDidUpdate(){
-
-        
-        
-    }
-
     render(){
+
 
         const {queue, queueShown, ordering, color, height, width, printReady, model, firebase,
             shownPerPage, currentPage, 
-         fieldChanged, onModelUploaded, onOrderPrint} = this.props;
+            onFieldChanged, onModelUploaded, onOrderPrint} = this.props;
 
         return (<OrderPrintPageWrapper>
 
@@ -119,8 +141,7 @@ class OrderPrintPage extends Component{
 
                         {queueShown.map( order => {
 
-                            console.log("order",order);
-                            return null;
+                            return <OrderInfo key={order.name}> {order.name} </OrderInfo>
                         })}
                        <Pagination pageSize = {shownPerPage} current = {currentPage} total = {queue.length}
                             onChange = {(page) => {onPageTurn(page);}}
@@ -131,38 +152,47 @@ class OrderPrintPage extends Component{
                 <Form  onSubmit = { (evt) => {
             
                         evt.preventDefault();
+
+                        //Do this on pop queue button pressed.
+                        //fileDownload(model,"model.obj");
                         const uid = firebase.auth().currentUser.uid;
-                        const orderInfo = {
 
-                            
-                            model,
-                            color,
-                            dimensions: {width, height},
-                        }
+                        var formData = new FormData();
 
-                        onOrderPrint(uid, orderInfo);
+                        formData.append("model",model);
+                        formData.append("color","red");
+                        formData.append("dimensions", {width,height});
+                        formData.append("orderer", uid);
+
+                      
+
+                        onOrderPrint( formData);
                         
                     }}>
                     
 
 
                     <Label for = "width"> Choose width </Label>
-                    <Input name = "width" id = "width" onChange = { (evt) => {fieldChanged(evt);}} value = {width}/>
+                    <Input name = "width" id = "width" onChange = { (evt) => {onFieldChanged(evt);}} value = {width}/>
 
                     <Label for = "height"> Choose height </Label>
-                    <Input name = "height" id = "height" onChange = { (evt) => {fieldChanged(evt);}} value = {height}/>
+                    <Input name = "height" id = "height" onChange = { (evt) => {onFieldChanged(evt);}} value = {height}/>
 
                     <DropZone onDrop = { (fileDropped) => {
                         
                         //This way I can also reject it if not right file.
-                        onModelUploaded(fileDropped);
+                        console.log("file dropped",fileDropped[0]);
+                        onModelUploaded(fileDropped[0]);
 
                     }}
                     
                     >
 
+                    <p> {model? model.name : ""} </p>
 
                     </DropZone>
+                    <Input type="submit" value="submit"/>
+
                 </Form>
             
             
@@ -185,6 +215,7 @@ const  mapStateToProps = createStructuredSelector({
     weight : createSelectField("weight"),
     printReady : createSelectBool("printReadyModel"),
     model : createUploadedModelSelector(),
+    firebase: makeSelectFirebase(),
 
 
 })
@@ -209,9 +240,9 @@ function mapDispatchToProps(dispatch){
             return dispatch(modelUploaded(model));
         },
 
-        onOrderPrint : (uid, orderInfo) => {
+        onOrderPrint : (orderInfo) => {
 
-            return dispatch(orderedPrint(uid, orderInfo));
+            return dispatch(orderedPrint(orderInfo));
         },
          
         onFieldChanged : (evt) => {
@@ -231,5 +262,4 @@ export default compose(
     withConnect,
     withReducer,
     withSaga,
-    withFirebase
 )(OrderPrintPage);

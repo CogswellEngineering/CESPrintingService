@@ -14,22 +14,24 @@ const fbAdminAPI = "http://localhost:5000";
 
 function* orderPrintCall(action){
 
-   
-
+    console.log("action in order print call",action);
 
     try{
 
+
+
+        
 
         //Sends post request to my back-end server.
         const response = yield call(request, fbAdminAPI + "/order_print", {
 
             method:"POST",
-            body: JSON.stringify(action),
+            body: action.printInfo,
         });
 
         if (response != null){
 
-           const body = yield call(response.json());
+           const body = yield call(response.json);
 
 
            if (body == null){

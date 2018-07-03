@@ -1,12 +1,13 @@
 import { fromJS} from 'immutable';
 import {
-
+    FIELD_CHANGED,
     PRINT_ORDER,
     PRINT_ORDER_FAILED,
     PRINT_ORDER_SUCCESS,
     PRINT_CANCELLED,
     QUEUE_UPDATED,
     PAGE_TURNED,
+    MODEL_UPLOADED,
 } from './constants';
 
 
@@ -23,8 +24,8 @@ const initialState = fromJS({
     ordering:false,
     //This kind of limits it, unless people know what they're doing, neeed to make screen for that case too.
     //Or if they have simplify3D then they can just upload that x3kg to us directly then only need color
-    height:0,
-    width:0,
+    height:"",
+    width:"",
     unit:"",
     color:"",
     //Will add option to upload xk3g file or just make it so these go away if modelFile is of type xk3g, prob better like that
@@ -42,19 +43,19 @@ const initialState = fromJS({
 function getShownQueue(page,queue,shownPerPage){
 
 
-    var shownPosts = [];
+    var shownQueue = [];
 
     //Because posts on each page goes by posts per page
-    const endingIndex = page * postsPerPage;
+    const endingIndex = page * shownPerPage;
 
-    var i = endingIndex - postsPerPage;
+    var i = endingIndex - shownPerPage  ;
 
-    for (; i < endingIndex && i < allPosts.length; ++i){
+    for (; i < endingIndex && i < queue.length; ++i){
 
-        shownPosts.push(allPosts[i]);
+        shownQueue.push(queue[i]);
     }
 
-    return shownPosts;
+    return shownQueue;
 
 
 }
@@ -62,25 +63,43 @@ function getShownQueue(page,queue,shownPerPage){
 
 export default function orderPrintReducer(state = initialState, action){
 
+    console.log("hello");
+
     switch(action.type){
 
 
         /*Shown Queue Related actions*/
 
+
         case QUEUE_UPDATED:
 
+            const updatedShownQueue = getShownQueue(state.get("currentPage"), action.queue, state.get("shownPerPage"));
+
+
             return state
-                .set("queue",action.queue);
+                .set("queue",action.queue)
+                .set("queueShown",updatedShownQueue);
 
         case PAGE_TURNED:
 
-            const pageQueue = getShownQueue(action.page,state.get("queue"), state.get("shownPerPage"));
+            const shownQueue = getShownQueue(action.page,state.get("queue"), state.get("shownPerPage"));
 
             return state
                 .set("currentPage", action.page)
-                .set("shownQueue", pagePosts);
+                .set("queueShown", shownQueue);
 
         //Literally exact same stuff like blog.
+
+        case MODEL_UPLOADED:
+
+            console.log("model uploaded",action.model);
+            return state
+                .set("uploadedModel", action.model);
+
+        case FIELD_CHANGED:
+
+            return state
+                .set(action.fieldName,action.value);
 
         case PRINT_ORDER:
             

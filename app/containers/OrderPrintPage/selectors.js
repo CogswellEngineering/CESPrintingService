@@ -35,6 +35,8 @@ const createUploadedModelSelector = () => createSelector(
 
         if (orderPrintPageState == null) return null;
 
+        console.log("selecting uploaded model");
+
         return orderPrintPageState.get("uploadedModel");
     }
 

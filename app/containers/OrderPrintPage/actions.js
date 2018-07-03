@@ -47,7 +47,7 @@ function queueUpdated(queue){
 
 }
 
-function orderedPrint(uid, printInfo){
+function orderedPrint(printInfo){
 
     return {
         type: PRINT_ORDER,
