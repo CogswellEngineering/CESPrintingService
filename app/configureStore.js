@@ -4,17 +4,12 @@
 
 import { createStore, applyMiddleware, compose } from 'redux';
 import { fromJS } from 'immutable';
-//import { routerMiddleware } from 'react-router-redux';
+import { routerMiddleware } from 'react-router-redux';
 import createSagaMiddleware from 'redux-saga';
-//import 'firebase/firestore';
+import 'firebase/firestore';
 import firebase from 'firebase';
-import { reactReduxFirebase } from 'react-redux-firebase';
-//import { reduxFirestore } from 'redux-firestore';
 import createReducer from './reducers';
 
-
-//Firebase initialization
-//Unfortunately can't use either package cause assumes it's a base store
 const fbConfig = {
   
   apiKey: 'AIzaSyADrVRU9CSIktkXnvQXcXFeOPicmYtC91M',
@@ -27,24 +22,11 @@ const fbConfig = {
 
 };
 
-const settings = {/* your settings... */ timestampsInSnapshots: true};
-
 firebase.initializeApp(fbConfig);
-//const firestore = firebase.firestore();
-//firestore.settings(settings);
 
-// react-redux-firebase config
-//Fuck this
-const rrfConfig = {
-
-  userProfile: 'users',
-
-  useFirestoreForProfile: true // Firestore for Profile instead of Realtime DB
-}
-
-
-
-
+const firestore = firebase.firestore();
+const settings = {/* your settings... */ timestampsInSnapshots: true};
+firestore.settings(settings);
 const sagaMiddleware = createSagaMiddleware();
 
 export default function configureStore(initialState = {}, history) {
@@ -75,12 +57,8 @@ export default function configureStore(initialState = {}, history) {
       : compose;
   /* eslint-enable */
 // Add reactReduxFirebase enhancer when making store creator
-const createStoreWithFirebase = compose(
-  reactReduxFirebase(firebase, rrfConfig),
-  // reduxFirestore(firebase) // <- needed if using firestore
-)(createStore);
 
-  const store = createStoreWithFirebase(
+  const store = createStore(
     createReducer(),
     fromJS(initialState),
     composeEnhancers(...enhancers),

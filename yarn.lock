@@ -1970,7 +1970,7 @@ cookie-signature@1.0.6:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/cookie-signature/-/cookie-signature-1.0.6.tgz#e303a882b342cc3ee8ca513a79999734dab3ae2c"
 
-cookie@0.3.1:
+cookie@0.3.1, cookie@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/cookie/-/cookie-0.3.1.tgz#e7e0a1f9ef43b4c8ba925c5c5a96e806d16873bb"
 
@@ -4821,6 +4821,10 @@ js-base64@^2.1.9:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.3.1.tgz#3705897c35fce0e202132630e750d8a17cd220ec"
 
+js-file-download@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/js-file-download/-/js-file-download-0.4.1.tgz#de0dd2d661d5635f506a73b962ab58ddb650bedb"
+
 js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/js-tokens/-/js-tokens-3.0.2.tgz#9866df395102130e38f7f996bceb65443209c25b"
@@ -6635,7 +6639,7 @@ prop-types@15.5.10, prop-types@^15.5.10, prop-types@^15.5.4:
     fbjs "^0.8.9"
     loose-envify "^1.3.1"
 
-prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2:
+prop-types@^15.0.0, prop-types@^15.5.7, prop-types@^15.5.8, prop-types@^15.6.1, prop-types@^15.6.2:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
@@ -6753,6 +6757,14 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+react-cookie@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/react-cookie/-/react-cookie-2.2.0.tgz#0ad91a04db235aa35af97032c388fe902be3560c"
+  dependencies:
+    hoist-non-react-statics "^2.3.1"
+    prop-types "^15.0.0"
+    universal-cookie "^2.2.0"
+
 react-dom@15.6.1:
   version "15.6.1"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-15.6.1.tgz#2cb0ed4191038e53c209eb3a79a23e2a4cf99470"
@@ -6804,14 +6816,6 @@ react-popper@^0.10.4:
   resolved "https://registry.yarnpkg.com/react-popper/-/react-popper-0.10.4.tgz#af2a415ea22291edd504678d7afda8a6ee3295aa"
   dependencies:
     popper.js "^1.14.1"
-    prop-types "^15.6.1"
-
-react-redux-firebase@^2.1.5:
-  version "2.1.5"
-  resolved "https://registry.yarnpkg.com/react-redux-firebase/-/react-redux-firebase-2.1.5.tgz#99d1929f309b3b47252baee7feb7eb054ad3c711"
-  dependencies:
-    hoist-non-react-statics "^2.3.1"
-    lodash "^4.17.10"
     prop-types "^15.6.1"
 
 react-redux@5.0.5:
@@ -7031,6 +7035,13 @@ reduce-function-call@^1.0.1:
   resolved "https://registry.yarnpkg.com/reduce-function-call/-/reduce-function-call-1.0.2.tgz#5a200bf92e0e37751752fe45b0ab330fd4b6be99"
   dependencies:
     balanced-match "^0.4.2"
+
+redux-firestore@^0.5.7:
+  version "0.5.7"
+  resolved "https://registry.yarnpkg.com/redux-firestore/-/redux-firestore-0.5.7.tgz#12595c61679bfeaa47d1ba0f4bfa87ea915dd80c"
+  dependencies:
+    lodash "^4.17.10"
+    prop-types "^15.6.1"
 
 redux-immutable@4.0.0:
   version "4.0.0"
@@ -8109,6 +8120,13 @@ unique-stream@^2.0.2:
   dependencies:
     json-stable-stringify "^1.0.0"
     through2-filter "^2.0.0"
+
+universal-cookie@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/universal-cookie/-/universal-cookie-2.2.0.tgz#328dc3883cf0ebd5b4904902033ad4dfdb907ed2"
+  dependencies:
+    cookie "^0.3.1"
+    object-assign "^4.1.0"
 
 unpipe@~1.0.0:
   version "1.0.0"

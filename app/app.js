@@ -12,6 +12,7 @@ import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
+import { CookiesProvider} from 'react-cookie';
 import { ConnectedRouter } from 'react-router-redux';
 import createHistory from 'history/createBrowserHistory';
 import 'sanitize.css/sanitize.css';
@@ -54,11 +55,13 @@ const MOUNT_NODE = document.getElementById('app');
 const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>
+    <CookiesProvider>
       <LanguageProvider messages={messages}>
         <ConnectedRouter history={history}>
           <App />
         </ConnectedRouter>
       </LanguageProvider>
+    </CookiesProvider>
     </Provider>,
     MOUNT_NODE
   );
