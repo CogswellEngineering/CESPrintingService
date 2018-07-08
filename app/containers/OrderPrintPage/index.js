@@ -19,6 +19,8 @@ import Pagination from 'rc-pagination';
 import 'rc-pagination/assets/index.css';
 import DropZone from 'react-dropzone';
 
+import {validFileTypes} from 'utils/validateModelUpload';
+
 import {
     createQueueSelector,
     createSelectShownPerPage,
@@ -155,12 +157,22 @@ class OrderPrintPage extends Component{
                     <DropZone onDrop = { (fileDropped) => {
                         
                         //This way I can also reject it if not right file.
-                        onModelUploaded(fileDropped);
+                        //Reject it, if not valid format.
+                        console.log("file dropped",fileDropped[0]);
+                        onModelUploaded(fileDropped[0]);
 
                     }}
                     
                     >
 
+                    {
+                        model? <p> model.name</p> :
+                        <div><p> Valid file types:</p>
+                        {validFileTypes.map(fileType => {
+                            return <p>  {fileType} </p>
+                        })}
+                        </div>
+                    }
 
                     </DropZone>
                 </Form>

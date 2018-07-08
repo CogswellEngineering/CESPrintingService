@@ -8,6 +8,7 @@ import {
     QUEUE_UPDATED,
     PAGE_TURNED,
 } from './constants';
+import isValidUpload from 'utils/validateModelUpload';
 
 
 const initialState = fromJS({
@@ -81,6 +82,39 @@ export default function orderPrintReducer(state = initialState, action){
                 .set("shownQueue", pagePosts);
 
         //Literally exact same stuff like blog.
+
+        case PRINTER_INFO_UPDATED:
+
+
+            return state
+                .set("printerState", action.printerInfo)
+                .set("color", action.printerInfo.colors[0]);
+
+        case MODEL_UPLOADED:
+
+            //Reject if file type not valid.
+            //This will be ina  function in util, as will be used by both this page, and uploading models for use.
+            console.log("model uploaded",action.model);
+           
+            if (isValidUpload(action.model)){
+                
+                return state
+                    .set("uploadedModel", action.model);
+            }
+            else{
+                
+                //If not valid, set it to null. If keep it as what was there before it might be confusing.
+                //Valid file types will also be shown in drop zone when uploaded model is null.
+                return state    
+                    .set("uploadedModel",null)
+                    .set("error", "Invalid file type");
+            }
+         
+
+        case FIELD_CHANGED:
+
+            return state
+                .set(action.fieldName,action.value);
 
         case PRINT_ORDER:
             
