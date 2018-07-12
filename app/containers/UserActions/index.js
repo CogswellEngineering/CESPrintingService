@@ -4,7 +4,6 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {compose} from 'redux';
 
-//Elements such as login, register, logout, userprofile, etc.
 import {LOGIN_PATH,REGISTER_PATH, USER_PROFILE_PATH} from 'components/Header/pages';
 import reducer from './reducer';
 import { createStructuredSelector } from 'reselect'; 
@@ -23,12 +22,11 @@ import {
 
 const UserActions  = (props) => {
     
-    console.log("login path",LOGIN_PATH);
-    console.log("props",props);
-       //Just so that all pops up at once, instead of delay on display name.
+ 
     if (props.firebase == null || props.profile == null){
         return null;
     }
+ 
     //It's stuff that should happen before anything renders.
 
      if (props.profile.isEmpty || props.firebase.auth().currentUser == null){

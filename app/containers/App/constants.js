@@ -10,6 +10,7 @@
  */
 
 export const DEFAULT_LOCALE = 'en';
+
 const prefix = 'CESPrintingService/App/';
 export const LOAD_APP = prefix + 'LOAD_APP';
 export const APP_LOADED = prefix + 'APP_LOADED';

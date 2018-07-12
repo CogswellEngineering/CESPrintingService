@@ -2,7 +2,6 @@ import { fromJS} from 'immutable';
 import { APP_LOADED, AUTH_CHECKED, LOGIN, LOGOUT} from './constants';
 import firebase from 'firebase';
 
-//Actually don't even need 
 const initialState = fromJS({
 
     loggedInUser: { isEmpty: true,},

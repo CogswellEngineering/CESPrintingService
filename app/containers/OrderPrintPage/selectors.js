@@ -3,7 +3,7 @@ import { ORDER_PRINT_PATH} from 'components/Header/pages';
 
 const orderPrintPageState = (state) => state.get(ORDER_PRINT_PATH);
 
-//Just remember prefix is make, not create woops.
+//Just remember prefix is make, not create woops, not huge but minor inconsistencies in my naming conventions.
 const createSelectPrinterInfo = () => createSelector(
 
 

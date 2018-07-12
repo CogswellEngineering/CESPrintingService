@@ -6,12 +6,10 @@ import firebase from 'firebase';
 function* logOutCall(){
 
 
-    //It's singleton so really same thing, but for good practice prob should pass in firebase, but fuck it for now.
-    console.log("current user from saga",firebase.auth().currentUser);
 
-    console.log("here?");
     yield firebase.auth().signOut()
         .then(res => {
+
             console.log("signed out", res);
 
         })

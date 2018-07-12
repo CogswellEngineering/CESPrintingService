@@ -15,7 +15,6 @@ import {
 const initialState = fromJS({
 
     /*State fields related to the model queue*/
-    //I could separate the shown queue part, or keep together like did BlogPage
     queue:[], 
     printerState : {
         colors : []

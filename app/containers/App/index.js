@@ -42,13 +42,6 @@ class App extends Component {
 
     if (!this.props.authChecked){
 
-      //Another thing react-redux-firebase did was persistence in login.
-      //Okay, only triggers on sign in and sign out.
-      console.log("Cookies", this.props.cookies);
-     
-      
-          // console.log("cookies",this.props.cookies);
-
         const authToken = (this.props.cookies.get("authToken"));
 
         //If it's null, then means logged out.
@@ -62,17 +55,13 @@ class App extends Component {
           
       
 
-        //So this listener knows when it's signed back in
-        //More and more feel like need react-redux-firebase tbh lol.
-        //Could just not have profile...
+    
       this.props.firebase.auth().onAuthStateChanged((user) => {
 
         
 
           //So signout occurs when logout pressed
           //that triggers this, which will logout in store as well.
-          //And for now, retarded, but will duplicate in other services.
-          //until reform to match actual sso flow
           if (!user) {
           
             //Once logged out this should remove the cookies if it exists.
@@ -85,7 +74,6 @@ class App extends Component {
             }
             else{
 
-              console.log("I happen?");
 
               try{
   
@@ -98,10 +86,9 @@ class App extends Component {
                 
                 
                   })
-                  //Not sure why expiring not caught in here, but whatever.
                   .catch (err =>{
             
-                    //If it fails here, 
+                    //If it fails here,
                     this.props.onCheckAuth();
                             
                   });      
@@ -112,8 +99,11 @@ class App extends Component {
                 //If failed then auth token likely expired. No other reason, because null was already checked for beforehand.
                 //So this needs to generate a new token.
                 //Then repeat sign in. feels like should be separate thing in saga
-                //due to both repeating and need to yield, but 
-                console.log("Err",err);        
+                //due to both repeating and need to yield.
+                /*Edit: Will just start using a SSO frameowork like github OAuth, I learned from this experience
+                and know that just need to generate refresh token, to pass in to generate an auth token for same user
+                in my server app. Might still do that for my own learning, but for sake of quality will likely start using a framework instead.*/ 
+                console.log(err);        
       
               }
               
