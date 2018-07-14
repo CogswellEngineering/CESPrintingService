@@ -16,14 +16,11 @@ const initialState = fromJS({
 
     /*State fields related to the model queue*/
     queue:[], 
-    printerState : {
-        colors : []
-
-    },
+    printerState : null,
     //What's currently shown based on page.
     queueShown:[],
     currentPage:1,
-    shownPerPage:5,
+    shownPerPage:3,
 
     ordering:false,
     //This kind of limits it, unless people know what they're doing, neeed to make screen for that case too.

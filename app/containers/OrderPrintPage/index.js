@@ -1,7 +1,6 @@
 import React, { Component} from 'react';
 import styled from 'styled-components';
-//Probably move this elsewhere later, doesn't make sense to be in components,
-//it's just data.
+
 import { ORDER_PRINT_PATH} from 'components/Header/pages';
 
 import injectReducer from 'utils/injectReducer';
@@ -49,7 +48,7 @@ import {
     updatedPrinterInfo,
 } from './actions';
 
-
+import PrintOrderInfo from 'components/PrintOrderInfo/';
 
 
 const OrderPrintPageWrapper = styled.div`
@@ -68,9 +67,10 @@ const OrderInfo = styled.span`
 
 `
 
-const PrintQueue = styled.div`
+const PrintQueue = styled.ul`
 
     margin-top :10%;
+    border:2px solid black;
     
 
 `
@@ -108,7 +108,7 @@ class OrderPrintPage extends Component{
         console.log("firebase ref",this.props.firebase);
 
         const printerServiceInfoRef = this.props.firebase.firestore().collection("PrinterServiceInfo");
-        const queueRef = printerServiceInfoRef.doc("Orders").collection("Queue");
+        const queueRef = printerServiceInfoRef.doc("OrderedPrints").collection("Queue");
         const printerStateRef = printerServiceInfoRef.doc("PrinterState");
 
         const options = {
@@ -142,15 +142,16 @@ class OrderPrintPage extends Component{
 
             console.log("doc data",doc.data());
             this.props.onUpdatePrinterInfo(doc.data());
+            
         }))
     }
 
     componentWillUnmount(){
 
         //Stops the event listener for
-        for (const unsubscribe in this.unsubscribeCalls){
+        for (const i in this.unsubscribeCalls){
 
-            unsubscribe();
+              this.unsubscribeCalls[i]();
         }
     }
 
@@ -175,25 +176,32 @@ class OrderPrintPage extends Component{
         const {queue, queueShown, ordering, color, height, width, printReady, model, firebase,
             printerState,
             shownPerPage, currentPage, 
-            onFieldChanged, onModelUploaded, onOrderPrint} = this.props;
+            onFieldChanged, onModelUploaded, onOrderPrint, onPageTurn} = this.props;
 
 
         if (printerState == null){
             return null;
         }
+
+        console.log("printer state", printerState);
         return (<OrderPrintPageWrapper>
 
                 {/*Need to install this and look at documentation for it*/}
                 <PrintQueue>
+                        <h1> Printer Queue </h1>
 
-                        {queueShown.map( order => {
+                        { queueShown.length != 0? queueShown.map( order => {
 
-                            return <OrderInfo key={order.name}> {order.name} </OrderInfo>
-                        })}
-                       <Pagination pageSize = {shownPerPage} current = {currentPage} total = {queue.length}
+                            return <PrintOrderInfo id={order.name+"_info"} key={order.name} order = {order}/> 
+                        })
+                        : <p> Queue is Empty </p>
+                        }
+                      
+                </PrintQueue>
+                {/*Works... but umm lol last page and next is diff language*/}
+                <Pagination pageSize = {shownPerPage} current = {currentPage} total = {queue.length} locale	= {{prev_page: 'prev', next_page: 'next'}}
                             onChange = {(page) => {onPageTurn(page);}}
                         />
-                </PrintQueue>
                 {/* NO internet need to add react-strap, ust typing to have it done*/}
 
                 <Form  onSubmit = { (evt) => {
@@ -224,7 +232,7 @@ class OrderPrintPage extends Component{
                     <Input name = "height" id = "height" onChange = { (evt) => {onFieldChanged(evt);}} value = {height}/>
 
                     {/*Do these REALLY have to be in redux state too? I mean i know one source of truth but shit*/}
-                    <Dropdown  name = "colorDd" isOpen = {this.state.colorDdOpen} toggle={this.toggleDd}>
+                    <Dropdown name = "colorDd" isOpen = {this.state.colorDdOpen} toggle={this.toggleDd}>
 
                         <DropdownToggle caret>
                             
@@ -235,7 +243,7 @@ class OrderPrintPage extends Component{
                         <DropdownMenu >
 
                             {printerState.colors.map( color => {
-                                return <DropdownItem key = {color} name="color" onClick = {(evt) => {onFieldChanged(evt);}}> {color} </DropdownItem>
+                                return <DropdownItem key = {color} name="color" value={color} onClick = {(evt) => {onFieldChanged(evt);}}> {color} </DropdownItem>
                             })}
 
                         </DropdownMenu>
@@ -253,7 +261,7 @@ class OrderPrintPage extends Component{
                     
                     >
 
-                    <p> {model? model.name : ""} </p>
+                    <p> {model? model.name : "Upload your model here"} </p>
 
                     </DropZone>
                     <Input type="submit" value="submit"/>
@@ -320,6 +328,8 @@ function mapDispatchToProps(dispatch){
         onFieldChanged : (evt) => {
 
             const target = evt.target;
+            console.log("target name", target.name);
+            console.log("target value", target.value);
             return dispatch(fieldChanged(target.name, target.value));
         },
 
