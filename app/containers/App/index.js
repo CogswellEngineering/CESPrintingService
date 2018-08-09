@@ -12,6 +12,7 @@
  */
 
 import React, {Component} from 'react';
+import styled from 'styled-components';
 import { Switch, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { connect } from 'react-redux';
@@ -22,6 +23,7 @@ import injectSaga from 'utils/injectSaga';
 
 import HomePage from 'containers/HomePage/Loadable';
 import Header from 'components/Header';
+import Footer from 'components/Footer';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import OrderPrintPage from 'containers/OrderPrintPage';
 import { withCookies, } from 'react-cookie';
@@ -30,8 +32,37 @@ import reducer from './reducer';
 import saga from './saga';
 import { makeSelectFirebase, makeSelectLoggedIn, makeSelectAuthChecked} from './selectors';
 import { appLoaded, authChecked, login, logout, } from './actions';
+import {homeURL } from 'components/Header/pages';
 
 var util = require('util');
+const AppWrapper = styled.div`
+
+
+    height:auto;
+
+`;
+
+const BodyWrapper = styled.div`
+
+    width:80%;
+    margin:auto;
+    height:80%;
+   
+    clear:both;
+    margin-top:20px;
+
+
+`;
+
+const FootWrapper = styled.div`
+
+  border:2px solid green;
+  margin:auto;
+  margin-top:24px;
+  height:200px;
+  width:80%;
+      
+`;
 
 
 class App extends Component {
@@ -133,14 +164,32 @@ class App extends Component {
         return null;
     }
     return (
-      <div>
+      <AppWrapper>
         <Header/>
+
+        <BodyWrapper>
         <Switch>
           <Route exact path="/" component={HomePage} />
-          <Route path = "/order-print" component= {OrderPrintPage}/>
+          <Route path = "/order-print" render= {() => {
+            
+            //If null user, then redirect to login
+            if (this.props.firebase.auth().currentUser == null){
+
+                //replace with actual name later. Interesting, so it's always idap in url but it stores actual value presumable in body or header.
+                //Easier would be just disabling order like i.materialize does. So leaving this like this and coming back
+                //this is extra shit, not needed as much as making it look good and fully functional.
+                window.open(homeURL+"/login?redir=true&dest=order-print");
+            }
+            
+            return <OrderPrintPage/>
+            }}/>
           <Route component={NotFoundPage} />
         </Switch>
-      </div>
+        </BodyWrapper>
+
+        <Footer/>
+
+      </AppWrapper>
     );
   }
 }

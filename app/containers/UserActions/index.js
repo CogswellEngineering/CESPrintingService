@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import React from 'react'
+import React, {Component} from 'react'
 import {connect} from 'react-redux';
 import {Link} from 'react-router-dom';
 import {compose} from 'redux';
@@ -11,76 +11,141 @@ import { makeSelectLoggedIn, makeSelectFirebase} from 'containers/App/selectors'
 import { logoutPressed} from './actions';
 import injectReducer from 'utils/injectReducer';
 
+import Popover from 'react-simple-popover';
+
+
 import {
     
     LoggedOutSection,
+    LogoutButton,
     LoggedInSection,
+    UserActionsWrapper,
     UserActionLink,
+    DisplayName,
+    Button,
 
 } from 'components/StyledComponents/UserActions';
 
 
-const UserActions  = (props) => {
+class UserActions extends Component{
     
- 
-    if (props.firebase == null || props.profile == null){
-        return null;
-    }
- 
-    //It's stuff that should happen before anything renders.
+    
+    constructor(props){
 
-     if (props.profile.isEmpty || props.firebase.auth().currentUser == null){
+        super(props);
 
-        return (<LoggedOutSection>
+        this.state = {
+            servicesOpen : false,
+        };
 
-                <UserActionLink href={LOGIN_PATH}> Login </UserActionLink>
-                <UserActionLink href={REGISTER_PATH}> Register </UserActionLink>
 
-            </LoggedOutSection>
-        )
+        this.toggleServices = this.toggleServices.bind(this);
+        this.closeServices = this.closeServices.bind(this);
+
     }
 
-    //Otherwise render Link to profile, logout button, etc.
-    const profilePath = USER_PROFILE_PATH.split(":")[0];
+    toggleServices(){
 
+        this.setState({
+          servicesOpen: !this.state.servicesOpen
+        });
+    
+        console.log("services open", this.state.servicesOpen);
+      }
+
+      closeServices(){
+
+        this.setState({
+          servicesOpen:false,
+        });
+      }
+    
     
  
-    return (
-        <LoggedInSection>
+    render() {
 
-                Hello, {props.profile.displayName} 
+        const props = this.props;
+            if (props.firebase == null || props.profile == null){
+                return null;
+            }
+        
+            //It's stuff that should happen before anything renders.
+            var actions = null;
+            if (props.profile.isEmpty || props.firebase.auth().currentUser == null){
 
-                <UserActionLink to = {profilePath+props.firebase.auth().currentUser.uid}> Profile </UserActionLink>
-                {/*Will switch to include uid if do decide make inventory public*/}
-                <UserActionLink to = {"/account/inventory"}> Inventory </UserActionLink>
-                
-                <button  onClick = {() => {props.onLogoutPressed();}}> Logout </button>
+                actions = (<LoggedOutSection>
+
+                        <UserActionLink href={LOGIN_PATH}> Login </UserActionLink>
+                        <UserActionLink href={REGISTER_PATH}> Register </UserActionLink>
+
+                    </LoggedOutSection>
+                )
+            }
+
+            //Otherwise render Link to profile, logout button, etc.
+            const profilePath = USER_PROFILE_PATH.split(":")[0];
+
             
-        </LoggedInSection>
-    )    
+        
+           
+            actions = <LoggedInSection>
+
+                        Hello, {props.profile.displayName} 
+
+                        <UserActionLink to = {profilePath+props.firebase.auth().currentUser.uid}> Profile </UserActionLink>
+                        {/*Will switch to include uid if do decide make inventory public*/}
+                        <UserActionLink to = {"/account/inventory"}> Inventory </UserActionLink>
+                        
+                        <button  onClick = {() => {props.onLogoutPressed();}}> Logout </button>
+                    
+                </LoggedInSection>
 
 
-}
+
+            
+            return  (
+
+                <UserActionsWrapper>
+
+                    <Button ref="target"  onClick = {this.toggleServices}> Account </Button>
+                    <Popover
+                        placement='bottom'
+                        target={this.refs.target}
+                        show={this.state.servicesOpen}
+                        onHide={this.closeServices}
+                    >
+                        <DisplayName> {props.profile.displayName} </DisplayName>
+                        <hr/>
+                        {actions}
+
+                    </Popover>
+
+            </UserActionsWrapper>
+            );
 
 
-const mapStateToProps = createStructuredSelector({
-
-    profile : makeSelectLoggedIn(),
-    firebase : makeSelectFirebase(),
-    
-});
-
-function mapDispatchToProps(dispatch){
-
-    return {
-
-        onLogoutPressed: () => {
-
-            return dispatch(logoutPressed());
-        },
+        }
     }
 
-}
+        const mapStateToProps = createStructuredSelector({
+
+            profile : makeSelectLoggedIn(),
+            firebase : makeSelectFirebase(),
+            
+        });
+
+        function mapDispatchToProps(dispatch){
+
+            return {
+
+                onLogoutPressed: () => {
+
+                    return dispatch(logoutPressed());
+                },
+            }
+
+        }
+    
 
 
 const withConnect = connect(mapStateToProps, mapDispatchToProps);

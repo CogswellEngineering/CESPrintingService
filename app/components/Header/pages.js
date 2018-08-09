@@ -4,12 +4,12 @@ export const navPages = [
       url: "/",
     },
    {
-      name: "Events",
-      url:"/events"
+      name: "Order a Print",
+      url:"/order-print"
     },
     {
-      name:"Blog",
-      url:"/blog"
+      name:"Browse Models",
+      url:"/browse-models"
     },
 ]
 
@@ -27,7 +27,7 @@ export const servicePages = [
 ];
 
 
-const homeURL = "http://localhost:3000";
+export const homeURL = "http://localhost:3000";
 
 
 export const LOGIN_PATH = homeURL + "/users/login";
