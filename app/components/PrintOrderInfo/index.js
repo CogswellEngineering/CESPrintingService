@@ -9,14 +9,14 @@ const PrintOrderInfoWrapper = styled.li`
     width:30%;
     display:inline-block;
     border: 2px solid black;
-    margin-left:1%;
+    margin-left:2%;
 
 `;
 
 
 const PopoverContent = styled.div`
 
-    padding-right:50px;
+    font-size:80%;
 
 `;
 const PopoverHeader = styled.p`
@@ -66,15 +66,15 @@ class PrintOrderInfo extends Component{
 
             <p> {name} </p>
             <Button onClick = {this.toggle} ref={name+"_info"}> Info </Button>
-            <Popover placement = "bottom" target = {this.refs[name+"_info"]} show = {this.state.popoverOpen} onHide = {this.close}>
+            <Popover placement = "right" target = {this.refs[name+"_info"]} show = {this.state.popoverOpen} onHide = {this.close}>
                 <PopoverContent>
-                    <PopoverHeader> Order Status </PopoverHeader>
+                    <PopoverHeader> Order Status of <p><b>{name}</b></p> </PopoverHeader>
                     <hr/>
 
                     <PopoverBody>
-                                <p>EST: {start} </p>
+                                <p>Estimated Start Time: {start} </p>
                                 <p>Duration: {duration}</p>
-                                <p>EET: {end} </p>
+                                <p>Estimated Finish Time: {end} </p>
                     </PopoverBody>
 
                 </PopoverContent>

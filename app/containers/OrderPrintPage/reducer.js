@@ -8,8 +8,13 @@ import {
     QUEUE_UPDATED,
     PAGE_TURNED,
     MODEL_UPLOADED,
+    MODEL_RENDERING,
+    MODEL_RENDERED,
     PRINTER_INFO_UPDATED,
 } from './constants';
+
+import { LOCATION_CHANGE } from 'react-router-redux';
+
 
 
 const initialState = fromJS({
@@ -25,16 +30,22 @@ const initialState = fromJS({
     ordering:false,
     //This kind of limits it, unless people know what they're doing, neeed to make screen for that case too.
     //Or if they have simplify3D then they can just upload that x3kg to us directly then only need color
-    height:"",
-    width:"",
+    y:0,
+    x:0,
+    z:0,
     unit:"",
     color:"",
+    material:"",
+    
+    //Will prob move this to different place later
+    modelURL:"",
+    renderingModel:false,
 
-    //Will add option to upload xk3g file or just make it so these go away if modelFile is of type xk3g, prob better like that
-    //but there are other types that are print ready, okay will give button for this options.
+
+    //Print ready
     isPrintReadyModel:false,
     uploadedModel:null,
-    reciept:null,
+    receipt:null,
     error:"",
 
 });
@@ -65,7 +76,6 @@ function getShownQueue(page,queue,shownPerPage){
 
 export default function orderPrintReducer(state = initialState, action){
 
-    console.log("hello");
 
     switch(action.type){
 
@@ -73,6 +83,20 @@ export default function orderPrintReducer(state = initialState, action){
         /*Shown Queue Related actions*/
 
 
+
+
+        case MODEL_RENDERING:
+            console.log("this is for sure happening");
+
+            return state
+                .set("modelURL",action.url)
+
+        case MODEL_RENDERED:
+
+            console.log("model rendered");
+
+            return state
+                .set("renderingModel",false);
 
         case QUEUE_UPDATED:
 
@@ -98,18 +122,52 @@ export default function orderPrintReducer(state = initialState, action){
 
             return state
                 .set("printerState", action.printerInfo)
-                .set("color", action.printerInfo.colors[0]);
+                .set("color", action.printerInfo.colors[0])
+                .set("material", action.printerInfo.materials[0])
 
         case MODEL_UPLOADED:
 
             console.log("model uploaded",action.model);
             return state
-                .set("uploadedModel", action.model);
+                .set("uploadedModel", action.model)
+                .set("renderingModel", true)
+                .set("error","");
+
 
         case FIELD_CHANGED:
 
+            const fieldName = action.fieldName;
+
+            if (fieldName == 'x' || fieldName == 'y' || fieldName == 'z'){
+                
+                
+                console.log("action value", action.value);
+                const newInput = action.value[action.value.length - 1];
+                console.log("new input",newInput);
+
+                if (newInput != null){
+                    
+                    const parsedInt = parseInt(newInput,10);
+
+                   
+                    if (isNaN(parsedInt)){
+                        return state;
+                    }
+                    else if (action.value[0] == '0'){
+                        //Otherwise replace the 0.
+                        return state
+                            .set(action.fieldName,parsedInt);
+
+                    }
+                }
+                else if (newInput == null){
+                    return state
+                        .set(action.fieldName,0);
+                }
+            }
             return state
-                .set(action.fieldName,action.value);
+                .set(action.fieldName,action.value)
+                .set("error","");
 
         case PRINT_ORDER:
             
@@ -127,7 +185,7 @@ export default function orderPrintReducer(state = initialState, action){
             //Initial state cause done with this order, or should i leave all the fields filled in? That's ux pov.
             return initialState
                 .set("ordering",false)
-                .set("reciept",action.reciept);
+                .set("receipt",action.receipt);
 
 
         //Add location_change to this later.

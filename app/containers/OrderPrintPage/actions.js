@@ -8,6 +8,8 @@ import {
     PAGE_TURNED,
     FIELD_CHANGED,
     MODEL_UPLOADED,
+    MODEL_RENDERED,
+    MODEL_RENDERING,
     PRINTER_INFO_UPDATED,
 } from './constants';
 
@@ -30,6 +32,21 @@ function pageTurned(page){
     };
 }
 
+function modelRendering(url){
+
+    return {
+        type:MODEL_RENDERING,
+        url
+    }
+}
+
+
+function modelRendered(){
+
+    return {
+        type: MODEL_RENDERED,
+    }
+}
 
 function modelUploaded(model) {
 
@@ -99,5 +116,7 @@ export {
     pageTurned,
     fieldChanged,
     modelUploaded,
+    modelRendered,
+    modelRendering,
     updatedPrinterInfo,
 };

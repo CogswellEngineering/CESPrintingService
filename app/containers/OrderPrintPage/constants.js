@@ -15,6 +15,10 @@ const PRINT_CANCELLED = PREFIX + "/PRINCE_CANCELLED";
 const PRINTER_INFO_UPDATED = PREFIX + "PRINTER_INFO_UPDATED";
 
 
+//This is called when url it is uploaded to sketchfab and we get url
+const MODEL_RENDERING = PREFIX + "/MODEL_RENDERING";
+//This is called when model viewer is done rendering it.
+const MODEL_RENDERED = PREFIX + "/MODEL_RENDERED";
 const MODEL_UPLOADED = PREFIX + "/MODEL_UPLOADED";
 
 //Field changed is general enough to be in global state of app, but for faster sake.
@@ -31,6 +35,8 @@ export{
     QUEUE_UPDATED,
     FIELD_CHANGED,
     MODEL_UPLOADED,
+    MODEL_RENDERED,
+    MODEL_RENDERING,
     PAGE_TURNED,
     PRINTER_INFO_UPDATED,
 };
