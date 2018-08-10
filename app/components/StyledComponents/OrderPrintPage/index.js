@@ -3,7 +3,7 @@ import Pagination from 'rc-pagination';
 import {DropdownMenu, Input, Dropdown, FormGroup, Form, DropdownItem, DropdownToggle, Button, CustomInput } from 'reactstrap';
 import Modal from 'react-responsive-modal';
 import DropZone from 'react-dropzone';
-
+import {Input } from 'components/StyledComponents/Generic';
 
 
 
@@ -132,14 +132,13 @@ const DimensionsImage = styled.img`
     margin:auto;
     display:block;
 `
-const DimensionsInput = styled.input`
+const DimensionsInput = styled(Input)`
 
     width:20%;
     height:2.5em;
     text-align:center;
     margin-left:5%;
     margin-top:4%;
-    border:1px solid black;
 
 `
 

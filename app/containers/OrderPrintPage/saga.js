@@ -11,6 +11,7 @@ import {
     modelRendering,
 } from './actions';
 
+//this should be in json file or another file, REMINDER TO MAKE THAT CHANGE, will prob do once update url to domain name.
 const fbAdminAPI = "http://localhost:5000";
 
 function* orderPrintCall(action){
