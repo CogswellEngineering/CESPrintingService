@@ -22,15 +22,17 @@ const Input = styled.input`
 const Button = styled.button`
 
     border: 1px solid black;
-    color:white;
 
-    &: hover{
+    &:hover{
 
         background-color:gray;
 
-    }
+    };
+    margin:auto;
+    
 
 `;
+
 
 export {
     Input,

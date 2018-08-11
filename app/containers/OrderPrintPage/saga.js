@@ -33,18 +33,13 @@ function* orderPrintCall(action){
 
         if (response != null){
 
-           const body = yield call(response.json);
+           //const body = yield call(response.json);
 
 
-           if (body == null){
-               throw new Error("body null");
-           }
-
-           console.log(body);
+          
 
            //The body returned is basically the reciept
-
-           yield put (orderSuccess(body));
+           yield put (orderSuccess(response));
 
         }
         else{

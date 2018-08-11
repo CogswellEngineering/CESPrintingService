@@ -92,11 +92,11 @@ function orderFailed(error){
     };
 }
 
-function orderSuccess(reciept){
+function orderSuccess(receipt){
     
     return {
         type: PRINT_ORDER_SUCCESS,
-        reciept,
+        receipt,
     };
 }
 

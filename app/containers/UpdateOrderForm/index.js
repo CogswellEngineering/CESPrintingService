@@ -1,11 +1,13 @@
 import React, {Component} from 'react';
 import { connect} from 'react-redux';
+import { compose} from 'redux';
 import styled from 'styled-components';
 import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
 import saga from './saga';
 import reducer from './reducer';
-import {updateOrder } from './actions'
+import { updateOrder } from './actions'
+import { FormGroup} from 'reactstrap';
 import { Input, Button} from 'components/StyledComponents/Generic';
 
 //This doesn't need reducer, but does need saga. I could keep all the fields local, instead of into global state
@@ -15,6 +17,11 @@ import { Input, Button} from 'components/StyledComponents/Generic';
 const UpdateOrderFormWrapper = styled.div`
 
 
+    margin-top:10px;
+`;
+
+const FieldSection = styled.section`
+
 `;
 
 //There's alot of redundant styling will add, so should inherit.
@@ -22,12 +29,19 @@ const UpdateOrderFormWrapper = styled.div`
 const Field = styled(Input)`
 
     margin:auto;
+    float:right;
+    clear:both;
+    margin-left:5px;
 
+`;
+
+const Label = styled.label`
+    text-align:right;
+    
 `;
 
 const SubmitInput = styled.input`
 
-    color:white;
     border: 1px solid black;
     background-color:white;
     &:hover{
@@ -36,9 +50,19 @@ const SubmitInput = styled.input`
     }
 `;
 
-const Label = styled.label`
 
-    display:block;
+
+const CancelButton = styled(Button)`
+
+
+    margin-left:5%;
+`;
+
+
+
+const ButtonGroup = styled.div`
+
+    text-align:center;
 `;
 
 
@@ -55,15 +79,41 @@ class UpdateOrderForm extends Component{
         //but similar aesthetic.
         this.state={
 
-            //Public info
+            //Public info, I'm honestly not sure what it should be
+            //String is easy, but format of these should be a date and time.
+            //Duration should also be a time.
             estimatedStartTime:"",
             estimatedEndTime:"",
             duration:"",
             //Private(Maybe public?)
             cost:"",
+            //Honestly could just have button called pop they can press that will do it. But doing it this way makes it so queue not
+            //strict structure or if have multiple 3D printers (Prob not happening). Then can mark any of them as finished. This feature
+            //als makes it so that people who know how to work it already can still print on their own during downtime, like in off hours, then
+            //they come in and do it. Then they will just mark it as finished, If i do it based on estimate by loading into printer
+            //Then it's awkward, but if I do it based on simplify3D estimates, then they'll get their estimates, but it may be off by a bit.
+            //Granted, smaller / simpler prints this won't be much of an issue.
+            //Now, as for this feature, I mean for scalability and it makes sense to mark it being finished apart of update form.
+            //If could mark finished other ones, then I do need to change back-end so that it also takes in the exact item,
+            //That won't be O(1), I could also have both mark as finished and pop, there you go. Have both.
+            markedFinished:false,
         };
 
         this.onUpdateField = this.onUpdateField.bind(this);
+    }
+
+    componentDidMount(){
+
+        const order = this.props.order;
+
+        //Not really needed anymore, but it's fine.
+        this.setState({
+            estimatedStartTime: order.start,
+            estimatedEndTime: order.end,
+            duration: order.duration,
+            cost: order.cost,
+        })
+
     }
 
     componentDidUpdate(){
@@ -72,7 +122,7 @@ class UpdateOrderForm extends Component{
         if (this.props.updated){
 
             //Should be here cause after updated, then it will update again, closing the modal this is in.
-            this.props.onUpdateSuccess();
+            this.props.close();
         }
 
     }
@@ -91,48 +141,55 @@ class UpdateOrderForm extends Component{
     render(){
 
         //It will also have prop from PrintOrderInfo, to call back to close it once update complete, which onUpdateSuccess
-        const {error, updated, onUpdate, onUpdateSuccess} = this.props;
+        const { order, error, updated, onUpdate, close} = this.props;
 
-
+        //Also will have a mark as finished button here. That will call the pop queue method.
         
 
         return ( <UpdateOrderFormWrapper>
 
             <form onSubmit = {(evt) => { 
+
                 evt.preventDefault(); 
 
-                var formData = new FormData();
-                //It's basically the whole state object, was hoping could save some lines of code.
-                formData.append("cost", this.state.cost);
-                formData.append("estimatedStartTime", this.state.estimatedStartTime);
-                formData.append("estimatedEndTime", this.state.estimatedEndTime);
-                formData.append("duration", this.state.duration);
+                const formData = {
 
+                     ...this.state,
+                    orderer:order.orderer,
+                    name: order.name,
+                    orderId : order.orderId,
+                    }
+               
                 onUpdate(formData);
             
             }}>
-
-            <Label for ="cost"> Cost 
-            <Field id="cost" value={this.state.cost} onChange={this.onUpdateField} />
-            </Label>
-
-            <Label for ="estimatedStartTime"> Start Time 
-            <Field id="estimatedStartTime" value={this.state.estimatedStartTime} onChange={this.onUpdateField} />
-            </Label>
-
-            <Label for ="estimatedEndTime"> End Time
-            <Field id="estimatedEndTime" value={this.state.estimatedEndTime} onChange={this.onUpdateField} />
-            </Label>
-
-
-            <Label for ="duration"> Duration 
-            <Field id="duration" value={this.state.duration} onChange={this.onUpdateField} />
-            </Label>
-
-            {/*Feel like cancel is redundant to X, but that's usually the case*/}
-            <Button onClick = { () => {onUpdateSuccess()}}> Cancel </Button>
-            <SubmitInput type="submit" value="Update" />
             
+            <FormGroup>
+            <Label for ="cost"> Cost </Label>
+            <Field id="cost" value={this.state.cost} onChange={this.onUpdateField} />
+            </FormGroup>
+
+            <FormGroup>
+            <Label for ="estimatedStartTime"> Start Time </Label>
+            <Field id="estimatedStartTime" value={this.state.estimatedStartTime} onChange={this.onUpdateField} />
+            </FormGroup>
+
+            <FormGroup>
+            <Label for ="estimatedEndTime"> End Time </Label>
+            <Field id="estimatedEndTime" value={this.state.estimatedEndTime} onChange={this.onUpdateField} />
+            </FormGroup>
+
+            <FormGroup>
+            <Label for ="duration"> Duration </Label>
+            <Field id="duration" value={this.state.duration} onChange={this.onUpdateField} />
+            </FormGroup>
+
+            <ButtonGroup>
+                <SubmitInput type="submit" value="Update" />
+
+                {/*Feel like cancel is redundant to X, but that's usually the case*/}
+                <CancelButton onClick = { (evt) => {evt.preventDefault();close()}}> Cancel </CancelButton>
+            </ButtonGroup>
 
             </form>
 
@@ -145,11 +202,12 @@ class UpdateOrderForm extends Component{
 //I don't think I need selector for this.
 function mapStateToProps(state){
 
+    const updateOrderState = state.get("UpdateOrder");
     //Should just be local state.
 
     return {
-        error: state.get("error"),
-        updated: state.get("updated"),
+        error: updateOrderState.get("error"),
+        updated: updateOrderState.get("updated"),
     };
 }
 

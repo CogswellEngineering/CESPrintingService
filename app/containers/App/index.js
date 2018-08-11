@@ -112,7 +112,9 @@ class App extends Component {
                   .then (res => {
                       this.props.onCheckAuth();
                       
+                      //Honestly, I could just use react-redux-firebase here too, it would be easier...
                       const profile = this.props.cookies.get("loggedInProfile");
+                      console.log("profle in cookies", profile);
                       this.props.login(profile);
                 
                 
@@ -120,6 +122,7 @@ class App extends Component {
                   .catch (err =>{
             
                     //If it fails here,
+                    console.log("fail, expired token");
                     this.props.onCheckAuth();
                             
                   });      
@@ -170,19 +173,7 @@ class App extends Component {
         <BodyWrapper>
         <Switch>
           <Route exact path="/" component={HomePage} />
-          <Route path = "/order-print" render= {() => {
-            
-            //If null user, then redirect to login
-            if (this.props.firebase.auth().currentUser == null){
-
-                //replace with actual name later. Interesting, so it's always idap in url but it stores actual value presumable in body or header.
-                //Easier would be just disabling order like i.materialize does. So leaving this like this and coming back
-                //this is extra shit, not needed as much as making it look good and fully functional.
-                window.open(homeURL+"/login?redir=true&dest=order-print");
-            }
-            
-            return <OrderPrintPage/>
-            }}/>
+          <Route path = "/order-print" component ={OrderPrintPage}/>
           <Route component={NotFoundPage} />
         </Switch>
         </BodyWrapper>

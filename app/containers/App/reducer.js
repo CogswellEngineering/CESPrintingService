@@ -30,7 +30,7 @@ export default function appReducer(state = initialState, action){
         case LOGOUT:
 
 
-            
+            console.log("logged out");
            
             const loggedOutProfile = {
                 isEmpty:true,

@@ -32,7 +32,7 @@ export const homeURL = "http://localhost:3000";
 
 export const LOGIN_PATH = homeURL + "/users/login";
 export const REGISTER_PATH = homeURL + "/users/register";
-export const USER_PROFILE_PATH = homeURL + "/account/:uid";
+export const USER_PROFILE_PATH = homeURL + "/account/";
 //Only owner can get to inventory and update profile
 export const USER_INVENTORY_PATH = "/account/inventory";
 export const UPDATE_USER_PROFILE_PATH = "/account/update";

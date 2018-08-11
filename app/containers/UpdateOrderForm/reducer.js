@@ -20,14 +20,16 @@ export default function updateOrderFormReducer(state=initialState, action){
     switch(action.type){
 
         case UPDATE_SUCCESS:
-            
+            console.log("setting updated to true");
             return state
                 .set("updated",true);
         case UPDATE_FAILED:
 
             return state
                 .set("error",action.error);
-            
+        default:
+
+            return state;
     }
 
 

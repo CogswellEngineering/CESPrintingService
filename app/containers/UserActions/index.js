@@ -71,6 +71,7 @@ class UserActions extends Component{
         
             //It's stuff that should happen before anything renders.
             var actions = null;
+            console.log("current user", props.firebase.auth().currentUser);
             if (props.profile.isEmpty || props.firebase.auth().currentUser == null){
 
                 actions = (<LoggedOutSection>
@@ -83,24 +84,24 @@ class UserActions extends Component{
             }
 
             //Otherwise render Link to profile, logout button, etc.
-            const profilePath = USER_PROFILE_PATH.split(":")[0];
 
+            if (props.firebase.auth().currentUser != null){
+                
+                
             
-        
-           
-            actions = <LoggedInSection>
+                actions = <LoggedInSection>
 
-                        Hello, {props.profile.displayName} 
+                            Hello, {props.profile.displayName} 
 
-                        <UserActionLink to = {profilePath+props.firebase.auth().currentUser.uid}> Profile </UserActionLink>
-                        {/*Will switch to include uid if do decide make inventory public*/}
-                        <UserActionLink to = {"/account/inventory"}> Inventory </UserActionLink>
+                            <UserActionLink href = {USER_PROFILE_PATH+props.firebase.auth().currentUser.uid}> Profile </UserActionLink>
+                            {/*Will switch to include uid if do decide make inventory public*/}
+                            <UserActionLink href = {"/account/inventory"}> Inventory </UserActionLink>
+                            
+                            <button  onClick = {() => {props.onLogoutPressed();}}> Logout </button>
                         
-                        <button  onClick = {() => {props.onLogoutPressed();}}> Logout </button>
-                    
-                </LoggedInSection>
+                    </LoggedInSection>
 
-
+            }
 
             
             return  (

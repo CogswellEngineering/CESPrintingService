@@ -29,7 +29,7 @@ const DisplayName = styled.p`
     font-size:20px;
 `;
 
-const UserActionLink = styled(Link)`
+const UserActionLink = styled.a`
 
     text-decoration:none;
     color:black;

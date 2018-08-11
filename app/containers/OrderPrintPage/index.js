@@ -22,6 +22,8 @@ import DropZone from 'react-dropzone';
 import DropdownCaretImage from '../../images/caret.png';
 import xyzGridImage from '../../images/xyzGrid.png';
 
+
+
 import {
     makeSelectFirebase,
     makeSelectLoggedIn,
@@ -93,10 +95,8 @@ class OrderPrintPage extends Component{
 
         super(props);
 
-        console.log(props);
 
         this.unsubscribeCalls = [];
-        console.log("hello");
 
 //        this.modelViewer = React.createRef();
         //Does this really have to be that?
@@ -120,8 +120,6 @@ class OrderPrintPage extends Component{
 
 
         //Creates firestore ref for
-        console.log(this.props);
-        console.log("firebase ref",this.props.firebase);
 
         const printerServiceInfoRef = this.props.firebase.firestore().collection("PrinterServiceInfo");
         const queueRef = printerServiceInfoRef.doc("OrderedPrints").collection("Queue");
@@ -132,35 +130,31 @@ class OrderPrintPage extends Component{
             includeMetadataChanges: true,
         };
 
-        //Subscription for queue.
+        //Subscription for queue, this should be triggering everytime, a change is made to queue. Including data changes
         this.unsubscribeCalls.push(queueRef.orderBy("orderTime").onSnapshot(options,(docSnapshot) => {
 
                     var newQueue = [];
                     const docs = docSnapshot.docs;
-
-                    //Needs to be ordered by date.
-                    //Or I could just now show it? After spending all that time though, fuck that.
-                    //Should be ordered by date.
-                   
+                    //Okay, so it only gets rid of the one updated, not the entire queue.
                     for ( const index in docSnapshot.docs){
 
                         const doc = docs[index];
-
+                        
                         if (doc.exists){
-                            newQueue.push(doc.data());
+                            const docData = doc.data();
+                            docData.orderId = doc.id;
+                            newQueue.push(docData);
                         }
                     }
-                    console.log("new queue",newQueue);
 
                     this.props.onQueueUpdated(newQueue);                
             }
         ));
 
 
-        //Subscription for colors available.
-        this.unsubscribeCalls.push(printerStateRef.onSnapshot(doc => {
+        //Subscription for colors and materials available.
+        this.unsubscribeCalls.push(printerStateRef.onSnapshot(options, doc => {
 
-            console.log("doc data",doc.data());
             this.props.onUpdatePrinterInfo(doc.data());
             
         }))
@@ -169,6 +163,7 @@ class OrderPrintPage extends Component{
     componentWillUnmount(){
 
         //Stops the event listener for
+
         for (const i in this.unsubscribeCalls){
 
               this.unsubscribeCalls[i]();
@@ -178,6 +173,8 @@ class OrderPrintPage extends Component{
 
     componentDidUpdate(prevProps, prevState){
 
+
+        /*
         //If modelURL changed, then is different and need to re-render and it's in sketchfab.
         if (this.props.modelURL != null && prevProps.modelURL !== this.props.modelURL){
 
@@ -259,6 +256,9 @@ class OrderPrintPage extends Component{
 
     }
 
+    */
+}
+
     openModal(){
 
         this.setState({
@@ -275,10 +275,8 @@ class OrderPrintPage extends Component{
 
     toggleDd(event){
 
-        console.log("event",event);
         const target = event.target;
 
-        console.log("target",target.id);
         this.setState({
 
             [target.id+"Open"] : !this.state[target.id+"Open"]
@@ -288,37 +286,27 @@ class OrderPrintPage extends Component{
 
     }
 
-    //Actually instead of checking receipt could check if error not empty, and if prev ordering and now not ordering.
-    //but need to pass receipt regardless.
-    componentDidUpdate(prevProps){
-
-
-        if (this.props.receipt){
-
-            //Need to push to receipt page.
-            console.log("props",props);
-        }
-    }
-
+  
     render(){
 
 
 
-        const {queue, queueShown, ordering, material, color, y, x, z, printReady, model, firebase, error, receipt,
+        const {loggedInUser, queue, queueShown, ordering, material, color, y, x, z, printReady, model, firebase, error, receipt,
             printerState,
             shownPerPage, currentPage, renderingModel,
             onFieldChanged, onModelUploaded, onOrderPrint, onPageTurn} = this.props;
 
-            console.log("rendering model", renderingModel);
+            //Okay so what might be happening is that the subscription dispatch, is somehow calling it to when the state was initial
+            //aka when it first happened. In other words,
+            //so, why is printerState null after this???
 
         if (printerState == null || printerState.materials == null || printerState.colors == null){
+            //Okay, here. 
             return null;
         }
 
        
 
-
-        console.log("printer state", printerState);
 
         const printQueue = (<PrintQueue>
                 
@@ -326,15 +314,15 @@ class OrderPrintPage extends Component{
 
                 { queueShown.length != 0? queueShown.map( order => {
 
-                    return <PrintOrderInfo id={order.name+"_info"} key={order.name} order = {order}/> 
+                    return <PrintOrderInfo id={order.orderId+"_info"} key={order.orderId} order = {order} isAdmin={loggedInUser.isAdmin}/> 
                 })
                 : <p> Queue is Empty </p>
                 }
           
             </PrintQueue>);
     
+    console.log("receipt",receipt);
         if (receipt != null){
-
             return (
                 <OrderPrintPageWrapper>
                 
@@ -347,6 +335,8 @@ class OrderPrintPage extends Component{
             );
 
         }
+        
+       //NOW WTF IS HAPPENING. IT DISAPPEARS EVERY TIME.
         return (<OrderPrintPageWrapper>
 
                 {/*Need to install this and look at documentation for it*/}
@@ -369,6 +359,7 @@ class OrderPrintPage extends Component{
                     {model?
                     //I mean I know I said would revise this to work better, but now not even woring peroiod? What the fuck.
                             <div>
+                                <p>hello</p>
                             <IFrameModelViewer hidden={this.renderingModel} ref={(iframe)=>{this.modelViewer = iframe}} src={this.modelViewer? this.modelViewer.src: ""} id="api-frame" allow="autoplay; fullscreen; vr"  allowFullScreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></IFrameModelViewer>
 
                             {!renderingModel?
@@ -389,7 +380,6 @@ class OrderPrintPage extends Component{
                                 <UploadModelButton> CLICK HERE TO UPLOAD MODEL 
                                 <input type="file" id="uploadModel" type="file" label="CLICK TO UPLOAD MODEL" 
                                     onChange = {(evt,file) => {
-                                        console.log("file uploaded", evt.target.files[0]);
                                         onModelUploaded(evt.target.files[0]);
                                     }}  
 
@@ -427,8 +417,8 @@ class OrderPrintPage extends Component{
 
                         formData.append("model",model);
                         formData.append("color",color);
-                        formData.append("dimensions", {x,y});
-                        formData.append("orderer", uid);                      
+                        formData.append("dimensions", JSON.stringify({x,y}));
+                        formData.append("orderer", uid);               
 
                         onOrderPrint( formData);
                         
@@ -511,6 +501,7 @@ class OrderPrintPage extends Component{
 
 const  mapStateToProps = createStructuredSelector({
 
+    loggedInUser: makeSelectLoggedIn(),
     printerState : createSelectPrinterInfo(),
     receipt : createSelectField("receipt"),
     queue : createQueueSelector(""),
@@ -567,8 +558,7 @@ function mapDispatchToProps(dispatch){
         onFieldChanged : (evt) => {
 
             const target = evt.target;
-            console.log("target name", target.name);
-            console.log("target value", target.value);
+       
             return dispatch(fieldChanged(target.name, target.value));
         },
 

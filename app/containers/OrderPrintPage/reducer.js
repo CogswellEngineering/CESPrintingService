@@ -21,6 +21,8 @@ const initialState = fromJS({
 
     /*State fields related to the model queue*/
     queue:[], 
+
+    //Okay, something is making this null upon ordering and it WASN'T happening before.
     printerState : null,
     //What's currently shown based on page.
     queueShown:[],
@@ -80,9 +82,13 @@ export default function orderPrintReducer(state = initialState, action){
     switch(action.type){
 
 
+        case LOCATION_CHANGE:
+
+            return initialState;
+
         /*Shown Queue Related actions*/
 
-
+        
 
 
         case MODEL_RENDERING:
@@ -102,7 +108,9 @@ export default function orderPrintReducer(state = initialState, action){
 
             const updatedShownQueue = getShownQueue(state.get("currentPage"), action.queue, state.get("shownPerPage"));
 
-
+            console.log("queue updating");
+            //So it does get to here,
+            console.log("printer state at this point", state.get("printerState"));
             return state
                 .set("queue",action.queue)
                 .set("queueShown",updatedShownQueue);
@@ -130,7 +138,7 @@ export default function orderPrintReducer(state = initialState, action){
             console.log("model uploaded",action.model);
             return state
                 .set("uploadedModel", action.model)
-                .set("renderingModel", true)
+                //.set("renderingModel", true)
                 .set("error","");
 
 
@@ -174,6 +182,7 @@ export default function orderPrintReducer(state = initialState, action){
             return state
                 .set("ordering",true);
 
+    console.log("body")
         case PRINT_ORDER_FAILED:
             
             return state
@@ -182,8 +191,9 @@ export default function orderPrintReducer(state = initialState, action){
 
         case PRINT_ORDER_SUCCESS:
             
+            console.log("action", action);
             //Initial state cause done with this order, or should i leave all the fields filled in? That's ux pov.
-            return initialState
+            return state
                 .set("ordering",false)
                 .set("receipt",action.receipt);
 

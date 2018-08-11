@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import Pagination from 'rc-pagination';
-import {DropdownMenu, Input, Dropdown, FormGroup, Form, DropdownItem, DropdownToggle, Button, CustomInput } from 'reactstrap';
+//Forgot did reactstrap for alot of theses
+import {DropdownMenu, Dropdown, FormGroup, Form, DropdownItem, DropdownToggle, Button, CustomInput } from 'reactstrap';
 import Modal from 'react-responsive-modal';
 import DropZone from 'react-dropzone';
 import {Input } from 'components/StyledComponents/Generic';
@@ -18,7 +19,7 @@ const OrderPrintPageWrapper = styled.div`
 
 const IFrameModelViewer = styled.iframe`
 
-    width:100%;
+   // width:100%;
     height:30em;
 
 
@@ -66,7 +67,7 @@ const RecentOrdersButton = styled.button`
 
 
      border: 1px solid green;
-     WIDTH:100%;
+     width:100%;
     padding-bottom:10px;
 
      

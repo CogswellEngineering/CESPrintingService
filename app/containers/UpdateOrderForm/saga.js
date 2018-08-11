@@ -1,7 +1,6 @@
 import {takeLatest, put, call} from 'redux-saga/effects'
 import request from 'utils/request';
 //For user.
-import firebase from 'firebase';
 import {
 
     UPDATE_ORDER,
@@ -15,28 +14,33 @@ import {
 
 } from './actions';
 
-const fbAdminAPI = "http://localhost:5000";
+const fbAdminAPI = "http://localhost:5000/";
 
 function* updateOrderInfoCall(action){
 
     const update = action.update;
+    console.log("update",update);
 
-    //Adds orderer field to update to match the order with user.
-    update.orderer = firebase.auth().currentUser;
+    //Instead of pop_queue, will be finish item.
+    const path = "print-order-processed";
 
     try{
-        const response = yield call(request, {
+        const response = yield call(request, fbAdminAPI+path,{
 
             method: "POST",
-            body: update,
+            body: JSON.stringify(update),
+            headers:{
+                'Content-Type' : 'application/json',
+            }
         });
+
 
         if (response.error){
 
             yield put(updateFailed(response.error));
         }
         else{
-            
+            console.log("Successful update.")
             yield put(updateSuccess());
         }
 
@@ -52,5 +56,5 @@ function* updateOrderInfoCall(action){
 
 export default function* updateOrderFormSaga(){
 
-    yield takeLatest(UPADTE_ORDER,updateOrderInfoCall );
+    yield takeLatest(UPDATE_ORDER,updateOrderInfoCall );
 }
