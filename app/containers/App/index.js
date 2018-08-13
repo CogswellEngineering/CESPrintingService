@@ -20,19 +20,21 @@ import { compose} from 'redux';
 import { createStructuredSelector} from 'reselect';
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
+import {Elements, } from 'react-stripe-elements';
 
 import HomePage from 'containers/HomePage/Loadable';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import OrderPrintPage from 'containers/OrderPrintPage';
+import ReceiptPage from 'containers/ReceiptPage';
 import { withCookies, } from 'react-cookie';
 
 import reducer from './reducer';
 import saga from './saga';
 import { makeSelectFirebase, makeSelectLoggedIn, makeSelectAuthChecked} from './selectors';
 import { appLoaded, authChecked, login, logout, } from './actions';
-import {homeURL } from 'components/Header/pages';
+import {homeURL, ORDER_PRINT_PATH, RECEIPT_PAGE_PATH } from 'components/Header/pages';
 
 var util = require('util');
 const AppWrapper = styled.div`
@@ -173,7 +175,12 @@ class App extends Component {
         <BodyWrapper>
         <Switch>
           <Route exact path="/" component={HomePage} />
-          <Route path = "/order-print" component ={OrderPrintPage}/>
+          <Route path = {ORDER_PRINT_PATH} component ={OrderPrintPage}/>
+          <Route path = {RECEIPT_PAGE_PATH} render = {(props) => {
+
+              return <Elements> <ReceiptPage {...props}/> </Elements>
+
+          }}
           <Route component={NotFoundPage} />
         </Switch>
         </BodyWrapper>

@@ -11,6 +11,8 @@ import 'babel-polyfill';
 // Import all the third party stuff
 import React from 'react';
 import ReactDOM from 'react-dom';
+import {Elements, StripeProvider} from 'react-stripe-elements';
+
 import { Provider } from 'react-redux';
 import { CookiesProvider} from 'react-cookie';
 import { ConnectedRouter } from 'react-router-redux';
@@ -46,16 +48,19 @@ const history = createHistory();
 const store = configureStore(initialState, history);
 const MOUNT_NODE = document.getElementById('app');
 
+
 const render = (messages) => {
   ReactDOM.render(
     <Provider store={store}>
     <CookiesProvider>
       <LanguageProvider messages={messages}>
+      <StripeProvider apiKey="pk_test_icJEjFT0M6rUG78qMSqwe7SH">
         <ConnectedRouter history={history}>
           <App>
             <Favicon url="./images/favicon.ico?"/>
             </App>
         </ConnectedRouter>
+        </StripeProvider>
       </LanguageProvider>
     </CookiesProvider>
     </Provider>,

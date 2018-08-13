@@ -14,6 +14,7 @@ import {
 
 } from './actions';
 
+//With how much I'm using this really should put somewhere already lol.
 const fbAdminAPI = "http://localhost:5000/";
 
 function* updateOrderInfoCall(action){

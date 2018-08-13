@@ -37,6 +37,7 @@ export const USER_PROFILE_PATH = homeURL + "/account/";
 export const USER_INVENTORY_PATH = "/account/inventory";
 export const UPDATE_USER_PROFILE_PATH = "/account/update";
 export const ORDER_PRINT_PATH = "/order-print";
+export const RECEIPT_PAGE_PATH = "/:uid/orders/:orderId";
 
 
 
