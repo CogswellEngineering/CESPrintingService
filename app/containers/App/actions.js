@@ -1,4 +1,4 @@
-import { APP_LOADED, AUTH_CHECKED, LOGIN, LOGOUT} from './constants';
+import { APP_LOADED, LOAD_PROFILE, AUTH_CHECKED, LOGIN, LOGOUT} from './constants';
 
 
 function authChecked(){
@@ -6,6 +6,14 @@ function authChecked(){
     return {
 
         type: AUTH_CHECKED,
+    }
+}
+
+function loadProfile(uid){
+
+    return {
+        type:LOAD_PROFILE,
+        uid,
     }
 }
 
@@ -39,6 +47,7 @@ function appLoaded(){
 
 export {
     appLoaded,
+    loadProfile,
     authChecked,
     login,
     logout,

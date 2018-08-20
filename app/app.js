@@ -54,13 +54,10 @@ const render = (messages) => {
     <Provider store={store}>
     <CookiesProvider>
       <LanguageProvider messages={messages}>
-      <StripeProvider apiKey="pk_test_icJEjFT0M6rUG78qMSqwe7SH">
         <ConnectedRouter history={history}>
           <App>
-            <Favicon url="./images/favicon.ico?"/>
             </App>
         </ConnectedRouter>
-        </StripeProvider>
       </LanguageProvider>
     </CookiesProvider>
     </Provider>,

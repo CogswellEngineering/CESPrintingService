@@ -13,28 +13,28 @@
 
 import React, {Component} from 'react';
 import styled from 'styled-components';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Redirect, } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { connect } from 'react-redux';
 import { compose} from 'redux';
 import { createStructuredSelector} from 'reselect';
 import injectReducer from 'utils/injectReducer';
 import injectSaga from 'utils/injectSaga';
-import {Elements, } from 'react-stripe-elements';
+import {Elements, StripeProvider} from 'react-stripe-elements';
 
 import HomePage from 'containers/HomePage/Loadable';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import OrderPrintPage from 'containers/OrderPrintPage';
-import ReceiptPage from 'containers/ReceiptPage';
+import ManageOrderPage from 'containers/ManageOrderPage';
 import { withCookies, } from 'react-cookie';
 
 import reducer from './reducer';
 import saga from './saga';
 import { makeSelectFirebase, makeSelectLoggedIn, makeSelectAuthChecked} from './selectors';
-import { appLoaded, authChecked, login, logout, } from './actions';
-import {homeURL, ORDER_PRINT_PATH, RECEIPT_PAGE_PATH } from 'components/Header/pages';
+import { appLoaded, authChecked, login, loadProfile, logout, } from './actions';
+import {homeURL, ORDER_PRINT_PATH, MANAGE_ORDER_PATH } from 'components/Header/pages';
 
 var util = require('util');
 const AppWrapper = styled.div`
@@ -80,7 +80,6 @@ class App extends Component {
         //If it's null, then means logged out.
         if (authToken == null){
 
-          console.log("am i happen?");
           this.props.onCheckAuth();
         }
 
@@ -96,12 +95,16 @@ class App extends Component {
           //So signout occurs when logout pressed
           //that triggers this, which will logout in store as well.
           if (!user) {
-          
             //Once logged out this should remove the cookies if it exists.
             //Cause if not empty means logout was pressed and signed out of firebase auth.
             if (!this.props.loggedInUser.isEmpty){
 
+
               this.props.logout();
+              //What If i don't ever do this removal?
+              //It might get rid of the bug, but then I won't stay logged out.
+              //Don't worry about this right now, just focus on functionality of other parts
+              //this will be replaced anyway.
               this.props.cookies.remove("authToken");
               this.props.cookies.remove("loggedInProfile");
             }
@@ -147,9 +150,9 @@ class App extends Component {
 
           }
           else{
-            const profile = this.props.cookies.get("loggedInProfile");
-            this.props.login(profile);
-            this.props.onCheckAuth();
+
+            
+            this.props.loadProfile(user.uid);
       
           }
          
@@ -169,25 +172,44 @@ class App extends Component {
         return null;
     }
     return (
+      <StripeProvider apiKey="pk_test_icJEjFT0M6rUG78qMSqwe7SH">
+
       <AppWrapper>
         <Header/>
 
         <BodyWrapper>
+        <Elements> 
+
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route path = {ORDER_PRINT_PATH} component ={OrderPrintPage}/>
-          <Route path = {RECEIPT_PAGE_PATH} render = {(props) => {
+          <Route path = {MANAGE_ORDER_PATH} render = {(props) => {
 
-              return <Elements> <ReceiptPage {...props}/> </Elements>
+              const {uid, orderId} = props.match.params;
 
-          }}
+              if (uid !== this.props.firebase.auth().currentUser.uid){
+
+                return <Redirect to="/" {...props} />
+              }
+              else{
+
+                //Don't need to pass in anything else from these set of props, will change back if need be.
+                //Okay so elements being in here, was wasn't working.
+                return <ManageOrderPage orderId = {orderId} history = {props.history}/> 
+              }
+
+          }}/>
           <Route component={NotFoundPage} />
         </Switch>
+        </Elements> 
+
         </BodyWrapper>
 
         <Footer/>
 
       </AppWrapper>
+      </StripeProvider>
+
     );
   }
 }
@@ -215,6 +237,10 @@ function mapDispatchToProps(dispatch) {
     login : (userProfile) => {
 
       return dispatch(login(userProfile))
+    },
+    loadProfile : (uid) => {
+
+      return dispatch(loadProfile(uid));
     },
 
     onLoad : () => {
