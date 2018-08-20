@@ -1,4 +1,4 @@
-const prefix = "ces/ReceiptPage";
+const prefix = "ces/ManageOrderPage";
 
 
 const ORDER_LOADED = prefix + "ORDER_LOADED";

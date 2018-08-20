@@ -86,7 +86,6 @@ class Header extends Component{
       servicesOpen: !this.state.servicesOpen
     });
 
-    console.log("services open", this.state.servicesOpen);
   }
 
   closeServices(){

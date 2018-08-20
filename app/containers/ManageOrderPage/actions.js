@@ -18,6 +18,7 @@ function orderLoaded(order){
 
 function confirmOrder(order, stripeToken){
 
+    console.log("stripe token", stripeToken);
     return {
 
         type: CONFIRM_ORDER,
@@ -32,10 +33,11 @@ function confirmOrder(order, stripeToken){
 //Passed in is orderID, and payment information 
 //Actually, before go further look into stripe api, cause technically. I shouldn't
 //have access to payment info lol.
-function orderConfirmed(){
+function orderConfirmed(receipt){
 
     return {
         type: ORDER_CONFIRMED,
+        receipt,
     };
 }
 

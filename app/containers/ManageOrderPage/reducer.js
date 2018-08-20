@@ -15,24 +15,28 @@ const initialState = fromJS({
 
     error: "",
     orderInfo:null,
-    orderConfirmed:false,
+    receipt:null,
 
 });
 
-export default function receiptReducer(state = initialState, action){
+export default function manageOrderReducer(state = initialState, action){
 
     switch(action.type){
 
         case ORDER_LOADED:
 
+            console.log("order loaded payload", action.order);
+            action.order.name = action.order.name.split("+").join(" ");
             return state
                 .set("orderInfo", action.order);
 
         case ORDER_CONFIRMED:
 
+            console.log("action on order confirmed", action);
+            
             return state
                 .set("error","")
-                .set("orderConfirmed", true);
+                .set("receipt", action.receipt);
 
         case ORDER_FAILED:
 
