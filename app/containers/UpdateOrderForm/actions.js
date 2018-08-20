@@ -3,9 +3,18 @@ import {
     UPDATE_ORDER,
     UPDATE_FAILED,
     UPDATE_SUCCESS,
+    LEAVE_FORM,
 } from './constants';
 
 
+
+function leaveForm(){
+
+
+    return{
+        type:LEAVE_FORM,
+    };
+}
 
 function updateOrder(update){
 
@@ -35,4 +44,5 @@ export{
     updateOrder,
     updateFailed,
     updateSuccess,
+    leaveForm,
 };

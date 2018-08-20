@@ -1,9 +1,11 @@
 import { fromJS} from 'immutable';
+import { LOCATION_CHANGE } from 'react-router-redux';
 
 import {
 
     UPDATE_FAILED,
     UPDATE_SUCCESS,
+    LEAVE_FORM,
 } from './constants';
 
 const initialState = fromJS({
@@ -27,6 +29,12 @@ export default function updateOrderFormReducer(state=initialState, action){
 
             return state
                 .set("error",action.error);
+
+        case LEAVE_FORM:
+            
+            return state
+                .set("updated",false);
+
         default:
 
             return state;

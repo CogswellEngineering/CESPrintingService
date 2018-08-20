@@ -6,7 +6,7 @@ import injectSaga from 'utils/injectSaga';
 import injectReducer from 'utils/injectReducer';
 import saga from './saga';
 import reducer from './reducer';
-import { updateOrder } from './actions'
+import { updateOrder, leaveForm, } from './actions'
 import { FormGroup} from 'reactstrap';
 import { Input, Button} from 'components/StyledComponents/Generic';
 
@@ -82,8 +82,8 @@ class UpdateOrderForm extends Component{
             //Public info, I'm honestly not sure what it should be
             //String is easy, but format of these should be a date and time.
             //Duration should also be a time.
-            estimatedStartTime:"",
-            estimatedEndTime:"",
+            start:"",
+            end:"",
             duration:"",
             //Private(Maybe public?)
             cost:"",
@@ -108,8 +108,8 @@ class UpdateOrderForm extends Component{
 
         //Not really needed anymore, but it's fine.
         this.setState({
-            estimatedStartTime: order.start,
-            estimatedEndTime: order.end,
+            start: order.start,
+            end: order.end,
             duration: order.duration,
             cost: order.cost,
         })
@@ -122,6 +122,7 @@ class UpdateOrderForm extends Component{
         if (this.props.updated){
 
             //Should be here cause after updated, then it will update again, closing the modal this is in.
+            this.props.leaveForm();
             this.props.close();
         }
 
@@ -141,7 +142,7 @@ class UpdateOrderForm extends Component{
     render(){
 
         //It will also have prop from PrintOrderInfo, to call back to close it once update complete, which onUpdateSuccess
-        const { order, error, updated, onUpdate, close} = this.props;
+        const { order, error, updated, onUpdate, close, leaveForm} = this.props;
 
         //Also will have a mark as finished button here. That will call the pop queue method.
         
@@ -170,13 +171,13 @@ class UpdateOrderForm extends Component{
             </FormGroup>
 
             <FormGroup>
-            <Label for ="estimatedStartTime"> Start Time </Label>
-            <Field id="estimatedStartTime" value={this.state.estimatedStartTime} onChange={this.onUpdateField} />
+            <Label for ="start"> Start Time </Label>
+            <Field id="start" value={this.state.start} onChange={this.onUpdateField} />
             </FormGroup>
 
             <FormGroup>
-            <Label for ="estimatedEndTime"> End Time </Label>
-            <Field id="estimatedEndTime" value={this.state.estimatedEndTime} onChange={this.onUpdateField} />
+            <Label for ="end"> End Time </Label>
+            <Field id="end" value={this.state.end} onChange={this.onUpdateField} />
             </FormGroup>
 
             <FormGroup>
@@ -188,7 +189,7 @@ class UpdateOrderForm extends Component{
                 <SubmitInput type="submit" value="Update" />
 
                 {/*Feel like cancel is redundant to X, but that's usually the case*/}
-                <CancelButton onClick = { (evt) => {evt.preventDefault();close()}}> Cancel </CancelButton>
+                <CancelButton onClick = { (evt) => {evt.preventDefault(); leaveForm(); close()}}> Cancel </CancelButton>
             </ButtonGroup>
 
             </form>
@@ -219,6 +220,11 @@ function mapDispatchToProps(dispatch){
         onUpdate: (formData) => {
 
             return dispatch(updateOrder(formData));
+        },
+
+        leaveForm : () => {
+
+            return dispatch(leaveForm());
         },
     }
 }
