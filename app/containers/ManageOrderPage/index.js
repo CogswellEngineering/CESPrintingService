@@ -198,7 +198,7 @@ class ManageOrderPage extends Component{
             {/* not just name, but model viewer here too*/}
             <OrderField> {"Printing: " +  orderInfo.name} </OrderField>
             {/*Instead of just the string will use string as key to json here that will get the actual img.*/}
-            <OrderField> {"in " + orderInfo.color} </OrderField>
+            <OrderField> {"Color:  " + orderInfo.color} </OrderField>
             <OrderField> {'Cost: $' + orderInfo.cost} </OrderField>
 
 
@@ -252,7 +252,7 @@ class ManageOrderPage extends Component{
 
 
 
-    }
+    }   
 
 
 }

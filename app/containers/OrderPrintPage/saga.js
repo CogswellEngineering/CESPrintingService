@@ -81,50 +81,6 @@ function* previewModel(payload){
 }
 
 
-//Using threejs for previwing 3d model now.
-function* sketchFabAPICall(action){
-
-    return;
-    console.log("action",action);
-
-    const model = action.model;
-    if (model == null){
-
-        return;
-    }
-    //Need to generate new id
-    const sketchFabURL = "https://sketchfab.com/v3/models";
-
-    const formData = new FormData();
-
-    formData.append("model",model);
-
-    //Will send a post request to server that will handle the actual uploading and 
-    try{
-        
-        const response = yield call(request,"http://localhost:5000/preview_model",{
-
-            method: "POST",
-            
-            body: formData,
-        });
-
-        console.log("response body", response);
-        console.log("this should've waited");
-        yield put (modelRendering(response.modelUrl));
-
-
-
-    }
-    catch(err){
-        console.log(err);
-        //Will dispatch an action that failed to load model, please try again. But tht's later.
-        //SOON, but not now. Soon because this needs to be fucking done already.
-    }
-
-   
-}
-
 function* orderPrintWatcher(){
 
     yield takeLatest(MODEL_UPLOADED, previewModel)

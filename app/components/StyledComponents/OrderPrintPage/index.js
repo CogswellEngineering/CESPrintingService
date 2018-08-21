@@ -16,15 +16,6 @@ const OrderPrintPageWrapper = styled.div`
 
 
 `
-
-const IFrameModelViewer = styled.iframe`
-
-   // width:100%;
-    height:30em;
-
-
-`;
-
 const ErrorMessage = styled.p`
 
     color:red;
@@ -194,8 +185,6 @@ export{
     RecentOrdersButton,
     RecentOrdersModal,
     UploadOptions,
-
-    IFrameModelViewer,
     ErrorMessage,
 
 }
