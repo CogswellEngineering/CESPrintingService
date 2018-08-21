@@ -96,6 +96,7 @@ export default function orderPrintReducer(state = initialState, action){
 
             return state
                 .set("modelURL",action.url)
+                .set("renderingModel",true)
 
         case MODEL_RENDERED:
 

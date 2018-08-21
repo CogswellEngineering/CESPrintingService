@@ -1,7 +1,10 @@
 /* eslint consistent-return:0 */
 
 const express = require('express');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
 const logger = require('./logger');
+var threeOBJ = require("three-obj");
 
 const argv = require('./argv');
 const port = require('./port');
@@ -10,7 +13,8 @@ const isDev = process.env.NODE_ENV !== 'production';
 const ngrok = (isDev && process.env.ENABLE_TUNNEL) || argv.tunnel ? require('ngrok') : false;
 const resolve = require('path').resolve;
 const app = express();
-
+app.use(fileUpload());
+app.use(cors());
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 // app.use('/api', myApi);
 
@@ -24,6 +28,36 @@ setup(app, {
 const customHost = argv.host || process.env.HOST;
 const host = customHost || null; // Let http.Server use its default IPv6/4 host
 const prettyHost = customHost || 'localhost';
+
+
+
+app.post("/previewModel",  (req,res) => {
+
+
+    console.log("get to here?");
+    const model = req.files.model;
+    console.log("cwd", process.cwd());
+    const filePath = "./build/"+model.name;
+    
+     model.mv(filePath)
+      .then(resolution => {
+
+          console.log("uploaded")
+         /* threeOBJ.load(filePath, (response) => {
+
+              console.log("data", response);
+          });*/
+          res.send({filePath:model.name});
+
+
+      })
+      .catch(err => {
+
+        console.log(err);
+      })
+
+
+})
 
 // Start your app.
 app.listen(port, host, (err) => {

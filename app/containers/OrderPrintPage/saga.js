@@ -3,6 +3,7 @@ import { takeLatest, put, call} from 'redux-saga/effects';
 import firebase from 'firebase';
 import { PRINT_ORDER, MODEL_UPLOADED} from './constants';
 import request from 'utils/request';
+var fileDownload = require('js-file-download');
 
 import {
     
@@ -17,6 +18,7 @@ const fbAdminAPI = "http://localhost:5000";
 function* orderPrintCall(action){
 
     console.log("action in order print call",action);
+    
 
     try{
 
@@ -55,11 +57,41 @@ function* orderPrintCall(action){
 
 }
 
+function* previewModel(payload){
+
+
+    console.log("here");
+    const filePath = "../../ModelHolder/"+payload.model.name
+    const formData = new FormData();
+    formData.append("model",  payload.model);
+    const response = yield call(request,"/previewModel", {
+
+        method: "POST",
+        body: formData
+        
+    });
+
+    console.log("response", response);
+
+    
+
+    //Instead of sketchfab api url, will use url of this path isntead.
+    yield put(modelRendering(response.filePath));
+
+}
+
+
+//Using threejs for previwing 3d model now.
 function* sketchFabAPICall(action){
 
+    return;
     console.log("action",action);
 
     const model = action.model;
+    if (model == null){
+
+        return;
+    }
     //Need to generate new id
     const sketchFabURL = "https://sketchfab.com/v3/models";
 
@@ -95,7 +127,7 @@ function* sketchFabAPICall(action){
 
 function* orderPrintWatcher(){
 
-    yield takeLatest(MODEL_UPLOADED, sketchFabAPICall)
+    yield takeLatest(MODEL_UPLOADED, previewModel)
     yield takeLatest(PRINT_ORDER, orderPrintCall);
 }
 

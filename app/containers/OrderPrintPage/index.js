@@ -10,6 +10,8 @@ import { compose } from 'redux';
 
 //Will port code over later, I don't want to duplicate that code.
 import { createStructuredSelector } from 'reselect';
+import  ModelViewer  from 'components/ModelViewer';
+import { Button,} from 'components/StyledComponents/Generic';
 import { Form, Label, Input, 
     Dropdown, DropdownToggle, DropdownMenu, DropdownItem,} from 'reactstrap';
 import reducer from './reducer';
@@ -21,6 +23,7 @@ import DropZone from 'react-dropzone';
 
 import DropdownCaretImage from '../../images/caret.png';
 import xyzGridImage from '../../images/xyzGrid.png';
+var fileDownload = require('js-file-download');
 
 
 
@@ -43,7 +46,6 @@ import {
 
 import saga from './saga';
 
-var fileDownload = require('js-file-download');
 
 import {
     orderedPrint,
@@ -329,21 +331,26 @@ class OrderPrintPage extends Component{
                 {printQueue}
                 <QueuePagination pageSize = {shownPerPage} current = {currentPage} total = {queue.length} locale	= {{prev_page: 'prev', next_page: 'next'}}
                 onChange = {(page) => {onPageTurn(page);}} />
-                <p> Your order to 3DPrint the has been placed in the queue. We will send you an email with your receipt once everything has been calculated. </p>
+                <p> Your order #{receipt.orderId} to 3DPrint the has been placed in the queue. Please check your email for information on managing your order.</p>
+                <Button> Click here to order another print </Button>
                 </OrderPrintPageWrapper>
                 
             );
 
         }
+        console.log("model obj", model);
         
        //NOW WTF IS HAPPENING. IT DISAPPEARS EVERY TIME.
         return (<OrderPrintPageWrapper>
+
+
 
                 {/*Need to install this and look at documentation for it*/}
                 
                 {/* NO internet need to add react-strap, ust typing to have it done*/}
 
                 {printQueue}
+
                 <QueuePagination pageSize = {shownPerPage} current = {currentPage} total = {queue.length} locale	= {{prev_page: 'prev', next_page: 'next'}}
                 onChange = {(page) => {onPageTurn(page);}} />
 
@@ -359,12 +366,34 @@ class OrderPrintPage extends Component{
                     {model?
                     //I mean I know I said would revise this to work better, but now not even woring peroiod? What the fuck.
                             <div>
-                                <p>hello</p>
-                            <IFrameModelViewer hidden={this.renderingModel} ref={(iframe)=>{this.modelViewer = iframe}} src={this.modelViewer? this.modelViewer.src: ""} id="api-frame" allow="autoplay; fullscreen; vr"  allowFullScreen="true" mozallowfullscreen="true" webkitallowfullscreen="true"></IFrameModelViewer>
 
-                            {!renderingModel?
+                                                        
+                                <UploadModelButton onClick = {() => {onModelUploaded(null);}}>UPLOAD DIFFERENT MODEL</UploadModelButton>
+                            {/*I could just make it a button that adds null to model uploaded, since essentially what I'm doing.*/}
+                            <UploadModelButton > UPLOAD DIFFERENT MODEL(file choose)
+
+                                <input type="file" id="uploadDifferentModel" type="file"
+                                    onChange = {(evt,file) => {
+                                        
+                                        console.log("this is triggered when cancel, but only sometimes");
+                                        console.log("evt", evt);
+
+                                        onModelUploaded(evt.target.files[0]);
+                                    }}  
+
+                                style={{display:"none"}}
+                            /> 
+                            </UploadModelButton>    
+
+
+
+                            
+                            {renderingModel?
                                 //I had this error before. 
-                                <p> Rendering {model.name}</p>
+
+                                <ModelViewer modelPath = {this.props.modelURL}/>
+
+
                             :
                                 null
                             }
@@ -380,6 +409,9 @@ class OrderPrintPage extends Component{
                                 <UploadModelButton> CLICK HERE TO UPLOAD MODEL 
                                 <input type="file" id="uploadModel" type="file" label="CLICK TO UPLOAD MODEL" 
                                     onChange = {(evt,file) => {
+
+                                        console.log("file", evt.target.files);
+
                                         onModelUploaded(evt.target.files[0]);
                                     }}  
 
